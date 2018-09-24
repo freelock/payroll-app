@@ -118,19 +118,20 @@ export default {
     defaultItem: {
       id: '',
       class: 'temporary',
-      rates: {
-        hourlyRate: 15.00,
-        FWH: 'S1',
-        ssEe: 1,
-        ssEr: 1,
-        medEe: 1,
-        medEr: 1,
-        lni: 1,
-        esd: 1,
-        ptoRate: 0.04,
-      },
+      rates: {},
       status: 1,
       ptoBalance: 0,
+    },
+    defaultRates: {
+      hourlyRate: 15.00,
+      FWH: 'S1',
+      ssEe: 1,
+      ssEr: 1,
+      medEe: 1,
+      medEr: 1,
+      lni: 1,
+      esd: 1,
+      ptoRate: 0.04,
     },
     classes: [
       'temporary',
@@ -165,6 +166,7 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedItem.rates = Object.assign({}, this.defaultRates);
         this.editedIndex = -1;
       }, 300);
     },
