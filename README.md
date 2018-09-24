@@ -1,5 +1,7 @@
 # payroll-app
 
+A payroll calculation app. Currently has 2018 US federal taxes, and Washington State deductions. Deductions must be manually edited in store.js, and there is no facility for saving data -- at the moment this is a proof-of-concept.
+
 ## Project setup
 ```
 yarn install
