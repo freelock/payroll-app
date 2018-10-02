@@ -22,5 +22,29 @@
       We do still need to apply rounding rules, and you currently need to use the
       Vue inspector to see the breakdown of taxes and deductions.
     </p>
+    <login v-show="!loggedIn"></login>
   </div>
 </template>
+
+<script>
+import Login from '@/components/Login.vue';
+
+export default {
+  computed: {
+    loggedIn() {
+      return this.$store.getters.loggedIn;
+    },
+  },
+  components: {
+    login: Login,
+  },
+};
+</script>
+
+<style>
+.v-content__wrap {
+  margin: 20px 50px;
+  font-size: 18px;
+}
+
+</style>

@@ -80,6 +80,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-btn @click.native="saveServer" color="blue darken-1">Save</v-btn>
   </v-toolbar>
     <employee-list
       :employees="employees"
@@ -178,6 +179,29 @@ export default {
       }
       this.close();
     },
+    async saveServer() {
+      try {
+        await this.$store.dispatch('saveEmployees');
+        this.$toaster.success('Employees Saved to server.');
+      } catch (error) {
+        // eslint-disable-next-line
+        console.log(error);
+        this.$toaster.error(`Server error: ${error.response.status}`);
+      }
+    },
+  },
+  mounted() {
+    if (!this.$store.state.employees.length) {
+      this.$store.dispatch('loadEmployees')
+        .then(() => {
+          this.$toaster.success('Loaded employees!');
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+          this.$toaster.error(`Got this error. ${error.response.status}`);
+        });
+    }
   },
   directives: {
     money: VMoney,

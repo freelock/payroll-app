@@ -8,7 +8,7 @@
           <td>{{ props.item.id }}</td>
           <td>{{ props.item.employees.length }}</td>
           <td>{{ props.item.quarter }}</td>
-          <td>2543</td>
+          <td>{{ props.item.totalPayroll }}</td>
           <td class="justify-center layout px-0">
           <v-icon
             small

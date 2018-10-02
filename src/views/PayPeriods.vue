@@ -73,15 +73,7 @@ export default {
   methods: {
     editItem(item) {
       this.editedIndex = this.payPeriods.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-    },
-    save() {
-      if (this.editedIndex > -1) {
-        this.$store.commit('updatePayPeriod', this.editedItem);
-      } else {
-        this.$store.commit('addPayPeriod', this.editedItem);
-      }
-      this.close();
+      this.editedItem = item;
     },
     newPayPeriod() {
       this.$store.commit('addPayPeriod', { id: this.createId });

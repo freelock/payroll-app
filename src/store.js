@@ -1,11 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
 import fwh from './utils/fwh';
+import config from './config';
 
 Vue.use(Vuex);
+axios.defaults.baseURL = config.url;
 
 export default new Vuex.Store({
   state: {
+    token: localStorage.getItem('access_token') || null,
+    username: localStorage.getItem('username') || null,
+    refreshSemaphore: false,
     lineItems: {
       periodItems: [
         {
@@ -134,11 +140,13 @@ export default new Vuex.Store({
         },
       ],
     },
-    employees: [
-    ],
+    employees: [],
     payPeriods: [],
   },
   getters: {
+    loggedIn(state) {
+      return state.token !== null;
+    },
     activeEmployees: state => state.employees.filter(employee => employee.status),
     activeList: (state, getters) => {
       const employees = getters.activeEmployees.map((employee) => {
@@ -247,12 +255,36 @@ export default new Vuex.Store({
 
   },
   mutations: {
+    retrieveToken(state, { token, username }) {
+      // eslint-disable-next-line
+      state.token = token;
+      // eslint-disable-next-line
+      state.username = username;
+    },
+    destroyToken(state) {
+      // eslint-disable-next-line
+      state.token = null;
+      // eslint-disable-next-line
+      state.username = null;
+    },
+    refreshSemaphore(state) {
+      // eslint-disable-next-line
+      state.refreshSemaphore = true;
+    },
+    clearSemaphore(state) {
+      // eslint-disable-next-line
+      state.refreshSemaphore = false;
+    },
     addEmployee: (state, payload) => {
       state.employees.unshift(payload);
     },
     updateEmployee: (state, employee) => {
       const myState = state;
       myState.employees = state.employees.map(e => (e.id === employee.id ? employee : e));
+    },
+    reloadEmployees: (state, employees) => {
+      // eslint-disable-next-line
+      state.employees = employees;
     },
     addPayPeriod(state, payload) {
       const month = payload.id.substr(5, 2);
@@ -284,6 +316,57 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    retrieveToken(context, credentials) {
+      return new Promise((resolve, reject) => {
+        const data = new FormData();
+        data.append('grant_type', 'password');
+        data.append('client_id', config.uuid);
+        data.append('client_secret', config.secret);
+        data.append('username', credentials.username);
+        data.append('password', credentials.password);
+
+        axios.post('/oauth/token', data)
+          .then((response) => {
+            const token = response.data;
+            localStorage.setItem('access_token', token.access_token);
+            localStorage.setItem('refresh_token', token.refresh_token);
+            localStorage.setItem('username', credentials.username);
+            context.commit('retrieveToken', { token: token.access_token, username: credentials.username });
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    refreshToken(context) {
+      return new Promise((resolve, reject) => {
+        const data = new FormData();
+        data.append('grant_type', 'refresh_token');
+        data.append('client_id', config.uuid);
+        data.append('client_secret', config.secret);
+        data.append('refresh_token', localStorage.getItem('refresh_token'));
+        axios.post('/oauth/token', data)
+          .then((response) => {
+            const token = response.data;
+            localStorage.setItem('access_token', token.access_token);
+            localStorage.setItem('refresh_token', token.refresh_token);
+            context.commit('retrieveToken', { token: token.access_token, username: localStorage.getItem('username') });
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    destroyToken(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token.access_token}`;
+
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('username');
+      context.commit('destroyToken');
+    },
     /**
      * Update the calculated payroll values
      * @param {*} context
@@ -335,6 +418,68 @@ export default new Vuex.Store({
       updateField.field = 'taxes';
       updateField.value = taxes;
       context.commit('updateHours', updateField);
+    },
+    async loadEmployees(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
+      try {
+        const response = await axios.get('/payroll/employees');
+        const employees = response.data;
+        context.commit('reloadEmployees', employees);
+        return employees;
+      } catch (error) {
+        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+          context.commit('refreshSemaphore');
+          await context.dispatch('refreshToken');
+          context.commit('clearSemaphore');
+          return context.dispatch('loadEmployees');
+        }
+        throw (error);
+      }
+    },
+    async saveEmployees(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
+      const { employees } = context.state;
+      try {
+        return await axios.post('/payroll/employees', employees);
+      } catch (error) {
+        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+          context.commit('refreshSemaphore');
+          await context.dispatch('refreshToken');
+          context.commit('clearSemaphore');
+          return context.dispatch('saveEmployees');
+        }
+        throw error;
+      }
+    },
+    async saveLineItems(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
+      const { lineItems } = context.state;
+      try {
+        return await axios.post('/payroll/lineitems', lineItems);
+      } catch (error) {
+        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+          context.commit('refreshSemaphore');
+          await context.dispatch('refreshToken');
+          context.commit('clearSemaphore');
+          return context.dispatch('saveLineItems');
+        }
+        throw error;
+      }
+    },
+    async savePayPeriods(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
+      const { payPeriods } = context.state;
+      try {
+        return await axios.post('/payroll/payperiods', payPeriods);
+      } catch (error) {
+        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+          context.commit('refreshSemaphore');
+          await context.dispatch('refreshToken');
+          context.commit('clearSemaphore');
+          return context.dispatch('savePayPeriods');
+        }
+        throw error;
+      }
     },
   },
 });
