@@ -33,6 +33,8 @@
         @click.native="newPayPeriod">
         New pay period
       </v-btn>
+      <v-btn @click.native="loadServer" color="primary">Load</v-btn>
+      <v-btn @click.native="saveServer" color="primary">Save</v-btn>
   </v-toolbar>
     <pay-period-list
       :payPeriods="payPeriods"
@@ -78,6 +80,26 @@ export default {
     newPayPeriod() {
       this.$store.commit('addPayPeriod', { id: this.createId });
       this.$router.push({ name: 'payperiod', params: { payperiod: this.createId } });
+    },
+    async saveServer() {
+      try {
+        await this.$store.dispatch('savePayPeriods');
+        this.$toaster.success('Payroll saved to server.');
+      } catch (error) {
+        // eslint-disable-next-line
+        console.log(error);
+        this.$toaster.error(`Server error: ${error.response.status}`);
+      }
+    },
+    async loadServer() {
+      try {
+        await this.$store.dispatch('loadPayPeriods');
+        this.$toaster.success('Payroll loaded from server.');
+      } catch (error) {
+        // eslint-disable-next-line
+        console.log(error);
+        this.$toaster.error(`Server error: ${error.response.status}`);
+      }
     },
   },
 };

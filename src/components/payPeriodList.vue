@@ -11,12 +11,14 @@
           <td>{{ props.item.totalPayroll }}</td>
           <td class="justify-center layout px-0">
           <v-icon
-            small
             class="mr-2"
             @click="editItem(props.item)"
           >
             edit
           </v-icon>
+          <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+            <v-icon color="pink">delete</v-icon>
+        </v-btn>
         </td>
         </tr>
       </template>
@@ -42,6 +44,10 @@ export default {
   methods: {
     editItem(item) {
       this.$router.push({ name: 'payperiod', params: { payperiod: item.id } });
+    },
+    deleteItem(item) {
+      const index = this.payPeriods.indexOf(item);
+      confirm('Are you sure you want to delete this item?') && this.$store.commit('deletePeriod', index);
     },
   },
 

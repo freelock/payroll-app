@@ -20,6 +20,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Employees.vue'),
     },
     {
+      path: '/lineitems',
+      name: 'lineitems',
+      component: () => import(/* webpackChunkName: "about" */ './views/LineItems.vue'),
+    },
+    {
       path: '/payperiods',
       name: 'payperiods',
       component: () => import(/* webpackChunkName: "about" */ './views/PayPeriods.vue'),

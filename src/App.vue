@@ -9,6 +9,9 @@
       <v-btn to="/employees">
         <v-icon>people</v-icon>Employees
       </v-btn>
+      <v-btn to="/lineitems">
+        <v-icon>assignment</v-icon>Line Items
+      </v-btn>
       <v-btn to="/payperiods">
         <v-icon>calendar_today</v-icon>Periods
       </v-btn>
@@ -18,6 +21,7 @@
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
       <h2 v-show="username">Hello, {{ username }}</h2>
+      <v-btn to="/payperiods" v-show="unsaved">Unsaved Payroll</v-btn>
       <v-btn icon @click.stop="logout">
         <v-icon>logout</v-icon>
       </v-btn>
@@ -46,6 +50,9 @@ export default {
   computed: {
     username() {
       return this.$store.state.username;
+    },
+    unsaved() {
+      return this.$store.state.dirty;
     },
   },
   methods: {

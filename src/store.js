@@ -12,6 +12,7 @@ export default new Vuex.Store({
     token: localStorage.getItem('access_token') || null,
     username: localStorage.getItem('username') || null,
     refreshSemaphore: false,
+    dirty: false,
     lineItems: {
       periodItems: [
         {
@@ -275,6 +276,10 @@ export default new Vuex.Store({
       // eslint-disable-next-line
       state.refreshSemaphore = false;
     },
+    clearDirty(state) {
+      // eslint-disable-next-line
+      state.dirty = false;
+    },
     addEmployee: (state, payload) => {
       state.employees.unshift(payload);
     },
@@ -285,6 +290,10 @@ export default new Vuex.Store({
     reloadEmployees: (state, employees) => {
       // eslint-disable-next-line
       state.employees = employees;
+    },
+    reloadPayPeriods(state, payPeriods) {
+      // eslint-disable-next-line
+      state.payPeriods = payPeriods;
     },
     addPayPeriod(state, payload) {
       const month = payload.id.substr(5, 2);
@@ -298,10 +307,18 @@ export default new Vuex.Store({
         ...payload,
       };
       state.payPeriods.unshift(payPeriod);
+      // eslint-disable-next-line
+      state.dirty = true;
+    },
+    deletePeriod(state, item) {
+      // eslint-disable-next-line
+      state.dirty = true;
+      state.payPeriods.splice(item);
     },
     updatePayPeriod: (state, payload) => {
       const myState = state;
       myState.payPeriods = state.payPeriods.map(p => (p.id === payload.id ? payload : p));
+      myState.dirty = true;
     },
     updateHours: (state, payload) => {
       const payperiod = state.payPeriods.find(pp => pp.id === payload.payperiod);
@@ -313,6 +330,8 @@ export default new Vuex.Store({
       employee.totals.net_income = employee.income.taxable
         - employee.deductions.total - employee.taxes.employee.total;
       employee.totals.worked = employee.income.worked;
+      // eslint-disable-next-line
+      state.dirty = true;
     },
   },
   actions: {
@@ -466,11 +485,30 @@ export default new Vuex.Store({
         throw error;
       }
     },
+    async loadPayPeriods(context) {
+      axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
+      try {
+        const response = await axios.get('/payroll/payperiods');
+        const payPeriods = response.data;
+        context.commit('reloadPayPeriods', payPeriods);
+        return payPeriods;
+      } catch (error) {
+        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+          context.commit('refreshSemaphore');
+          await context.dispatch('refreshToken');
+          context.commit('clearSemaphore');
+          return context.dispatch('loadPayPeriods');
+        }
+        throw (error);
+      }
+    },
     async savePayPeriods(context) {
       axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
       const { payPeriods } = context.state;
       try {
-        return await axios.post('/payroll/payperiods', payPeriods);
+        const savePromise = await axios.post('/payroll/payperiods', payPeriods);
+        context.commit('clearDirty');
+        return savePromise;
       } catch (error) {
         if (error.response.status === 403 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');

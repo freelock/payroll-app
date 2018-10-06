@@ -6,6 +6,7 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td>{{ props.item.id }}</td>
+          <td>{{ props.item.status }}</td>
           <td>{{ props.item.class }}</td>
           <td>{{ props.item.rates.salary }}</td>
           <td>{{ props.item.rates.hourlyRate }}</td>
@@ -34,6 +35,7 @@ export default {
   data: () => ({
     headers: [
       { text: 'Employee', value: 'id' },
+      { text: 'Active?', value: 'status' },
       { text: 'Class', value: 'class' },
       { text: 'Salary', value: 'rates.salary' },
       { text: 'Hourly', value: 'rates.hourlyRate' },

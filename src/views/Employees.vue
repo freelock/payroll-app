@@ -80,7 +80,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-btn @click.native="saveServer" color="blue darken-1">Save</v-btn>
+      <v-btn @click.native="saveServer" color="primary">Save</v-btn>
   </v-toolbar>
     <employee-list
       :employees="employees"
