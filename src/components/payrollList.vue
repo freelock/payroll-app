@@ -65,7 +65,7 @@
           <td>{{ props.item.income.total }}</td>
           <td>{{ props.item.deductions.total }}</td>
           <td>{{ props.item.taxes.employee.total }}</td>
-          <td>{{ props.item.totals.net_income }}</td>
+          <td>{{ format(props.item, 'net_income') }}</td>
           <td class="justify-center layout px-0">
           <v-icon
             small
@@ -84,6 +84,7 @@
 
 <script>
 import { VMoney } from 'v-money';
+import Dinero from 'dinero.js';
 
 export default {
   props: [
@@ -121,6 +122,9 @@ export default {
         id: item.id,
       };
       this.$emit('itemSave', update);
+    },
+    format(totals, field) {
+      return Dinero({ amount: totals.totals[field] }).toFormat();
     },
   },
   directives: {

@@ -36,10 +36,6 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.ptoBalance"
-                   label="PTO Balance"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.rates.FWH"
                    label="FWH deductions"></v-text-field>
                 </v-flex>
@@ -114,14 +110,12 @@ export default {
         ptoRate: 0.04,
       },
       status: 1,
-      ptoBalance: 0,
     },
     defaultItem: {
       id: '',
       class: 'temporary',
       rates: {},
       status: 1,
-      ptoBalance: 0,
     },
     defaultRates: {
       hourlyRate: 15.00,

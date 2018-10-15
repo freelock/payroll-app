@@ -11,6 +11,7 @@
     "@babel/polyfill": "^7.0.0-rc.1",
     "axios": "^0.18.0",
     "dinero.js": "^1.4.0",
+    "lodash.clonedeep": "^4.5.0",
     "v-money": "^0.8.1",
     "v-toaster": "^1.0.3",
     "vue": "^2.5.17",

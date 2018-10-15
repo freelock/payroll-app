@@ -77,8 +77,8 @@ export default {
       this.editedIndex = this.payPeriods.indexOf(item);
       this.editedItem = item;
     },
-    newPayPeriod() {
-      this.$store.commit('addPayPeriod', { id: this.createId });
+    async newPayPeriod() {
+      await this.$store.dispatch('addNewPayPeriod', { id: this.createId });
       this.$router.push({ name: 'payperiod', params: { payperiod: this.createId } });
     },
     async saveServer() {
