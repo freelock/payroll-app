@@ -30,11 +30,6 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/PayPeriods.vue'),
     },
     {
-      path: '/payreport',
-      name: 'payreport',
-      component: () => import(/* webpackChunkName: "about" */ './views/PayReport.vue'),
-    },
-    {
       path: '/',
       name: 'about',
       // route level code-splitting
@@ -46,6 +41,23 @@ export default new Router({
       path: '/payperiods/:payperiod',
       name: 'payperiod',
       component: () => import(/* webpackChunkName: "payperiod" */ './views/PayPeriod.vue'),
+      props: true,
+    },
+    {
+      path: '/payperiods/:payperiod/:employee',
+      name: 'paystub',
+      component: () => import(/* webpackChunkName: "payperiod" */ './views/PayCheck.vue'),
+      props: true,
+    },
+    {
+      path: '/payreport',
+      name: 'payreport',
+      component: () => import(/* webpackChunkName: "about" */ './views/PayReport.vue'),
+    },
+    {
+      path: '/payreport/:periods/:period',
+      name: 'report',
+      component: () => import(/* webpackChunkName: "about" */ './views/Report.vue'),
       props: true,
     },
   ],

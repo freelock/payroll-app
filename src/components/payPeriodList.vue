@@ -8,7 +8,7 @@
           <td>{{ props.item.id }}</td>
           <td>{{ props.item.employees.length }}</td>
           <td>{{ props.item.quarter }}</td>
-          <td>{{ props.item.totalPayroll }}</td>
+          <td>{{ format(props.item.employer.total_income) }}</td>
           <td class="justify-center layout px-0">
           <v-icon
             class="mr-2"
@@ -26,7 +26,8 @@
 </template>
 
 <script>
-
+import { mapGetters } from 'vuex';
+import Dinero from 'dinero.js';
 
 export default {
   props: [
@@ -41,7 +42,16 @@ export default {
       { text: 'Actions', value: 'name', sortable: false },
     ],
   }),
+  computed: {
+    ...mapGetters([
+      'employerCalc',
+    ]),
+  },
   methods: {
+    format(num) {
+      const myNum = num || 0;
+      return Dinero({ amount: myNum }).toFormat();
+    },
     editItem(item) {
       this.$router.push({ name: 'payperiod', params: { payperiod: item.id } });
     },

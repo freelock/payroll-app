@@ -3,7 +3,8 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 import { cloneDeep } from 'lodash.clonedeep';
-import fwh from './utils/fwh';
+import fwh2018 from './utils/fwh2018';
+import fwh2017 from './utils/fwh2017';
 import config from './config';
 
 Vue.use(Vuex);
@@ -223,6 +224,7 @@ export default new Vuex.Store({
       state.lineItems.taxes.map((tax) => {
         if (empRates[tax.id]) {
           const basis = Dinero({ amount: Math.round(payCheck.totals[tax.basis]) });
+          const fwh = payCheck.payperiod <= '2018-02' ? fwh2017 : fwh2018;
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {
             case 'calculated':
@@ -413,14 +415,20 @@ export default new Vuex.Store({
     updateHours: (state, payload) => {
       const payperiod = state.payPeriods.find(pp => pp.id === payload.payperiod);
       const employee = payperiod.employees.find(emp => emp.id === payload.id);
+      const notexempt = state.employees.find(item => item.id === payload.id).class !== 'owner-exempt';
       employee[payload.field] = payload.value;
+      employee.payperiod = payperiod.id;
       employee.totals.total_income = employee.income.total;
+      employee.totals.total_income_exempt = employee.income.total * notexempt;
       employee.totals.medicare_income = employee.income.total;
       employee.totals.taxable_income = employee.income.taxable - employee.deductions.tax_exempt;
+      employee.totals.taxable_income_exempt = (employee.income.taxable - employee.deductions.tax_exempt) * notexempt;
       employee.totals.net_income = employee.income.taxable
         - employee.deductions.total - employee.taxes.employee.total;
       employee.totals.hourlyWorked = employee.income.hourlyWorked;
+      employee.totals.hourlyWorkedExempt = employee.income.hourlyWorked * notexempt;
       employee.totals.hourlyTotal = employee.income.hourlyTotal;
+      employee.totals.hourlyTotalExempt = employee.income.hourlyTotal * notexempt;
       // eslint-disable-next-line
       state.dirty = true;
       // now recalculate employer taxes
@@ -553,6 +561,8 @@ export default new Vuex.Store({
           + (1 * payCheck.holidayUsed);
       }
       income.ptoUsed = ptoUsed.getAmount();
+      income.holidayUsed = holidayUsed.getAmount();
+      income.bonus = payCheck.bonus * 100;
       income.total = total.add(Dinero({ amount: payCheck.bonus * 100 })).getAmount();
       income.taxable = income.total;
 

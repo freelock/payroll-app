@@ -62,10 +62,10 @@
               prefix="$"
             ></v-text-field>
             {{ props.item.bonus }}</td>
-          <td>{{ props.item.income.total }}</td>
-          <td>{{ props.item.deductions.total }}</td>
-          <td>{{ props.item.taxes.employee.total }}</td>
-          <td>{{ format(props.item, 'net_income') }}</td>
+          <td>{{ format(props.item.income.total) }}</td>
+          <td>{{ format(props.item.deductions.total) }}</td>
+          <td>{{ format(props.item.taxes.employee.total) }}</td>
+          <td>{{ format(props.item.totals.net_income) }}</td>
           <td class="justify-center layout px-0">
           <v-icon
             small
@@ -73,6 +73,12 @@
             @click="editItem(props.item)"
           >
             edit
+          </v-icon>
+          <v-icon
+            small
+            class="mr-2"
+            @click="showPaystub(props.item)">
+            attach_money
           </v-icon>
         </td>
         </tr>
@@ -123,8 +129,15 @@ export default {
       };
       this.$emit('itemSave', update);
     },
-    format(totals, field) {
-      return Dinero({ amount: totals.totals[field] }).toFormat();
+    showPaystub(employee) {
+      this.$router.push({
+        name: 'paystub',
+        params: { payperiod: this.$route.params.payperiod, employee: employee.id },
+      });
+    },
+    format(num) {
+      const myNum = num || 0;
+      return Dinero({ amount: myNum }).toFormat();
     },
   },
   directives: {

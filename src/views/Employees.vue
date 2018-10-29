@@ -132,6 +132,7 @@ export default {
       'temporary',
       'permanent',
       'owner',
+      'owner-exempt',
     ],
     money: {
       prefix: '',
