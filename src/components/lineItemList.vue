@@ -34,7 +34,7 @@ export default {
       { text: 'Chart ID', value: 'chart_id' },
       { text: 'Basis', value: 'basis' },
       { text: 'Rate', value: 'rate' },
-      { text: 'Tax Exampt?', value: 'tax_exempt' },
+      { text: 'Tax Exempt?', value: 'tax_exempt' },
       { text: 'Applies to', value: 'applies' },
       { text: 'Actions', value: 'name', sortable: false },
     ],
