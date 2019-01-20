@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 import { cloneDeep } from 'lodash.clonedeep';
+import fwh2019 from './utils/fwh2019';
 import fwh2018 from './utils/fwh2018';
 import fwh2017 from './utils/fwh2017';
 import config from './config';
@@ -155,6 +156,16 @@ export default new Vuex.Store({
           group: 'esd',
           chart_id: '6767',
         },
+        {
+          id: 'waFmlEe',
+          name: 'Washington Family/Medical Leave deduction',
+          type: 'waFml',
+          basis: 'medicare_income',
+          rate: 0.4,
+          applies: 'employee',
+          group: 'esd',
+          chart_id: '2167',
+        },
       ],
       accounts: [
         {
@@ -224,7 +235,10 @@ export default new Vuex.Store({
       state.lineItems.taxes.map((tax) => {
         if (empRates[tax.id]) {
           const basis = Dinero({ amount: Math.round(payCheck.totals[tax.basis]) });
-          const fwh = payCheck.payperiod <= '2018-02' ? fwh2017 : fwh2018;
+          let fwh = payCheck.payperiod <= '2018-02' ? fwh2017 : fwh2018;
+          if (payCheck.payperiod > '2019-01') {
+            fwh = fwh2019;
+          }
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {
             case 'calculated':
