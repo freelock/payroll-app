@@ -2,6 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="employees"
+    :pagination="pagination"
     >
       <template slot="items" slot-scope="props">
         <tr>
@@ -42,6 +43,13 @@ export default {
       { text: 'PTO Balance', value: 'ptoBalance' },
       { text: 'Actions', value: 'name', sortable: false },
     ],
+    pagination: {
+      descending: false,
+      page: 1,
+      rowsPerPage: 25,
+      sortBy: 'id',
+      totalItems: 0,
+    },
   }),
   methods: {
     editItem(item) {

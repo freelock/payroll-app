@@ -68,14 +68,12 @@
           <td>{{ format(props.item.totals.net_income) }}</td>
           <td class="justify-center layout px-0">
           <v-icon
-            small
             class="mr-2"
-            @click="editItem(props.item)"
+            @click="editPaystub(props.item)"
           >
             edit
           </v-icon>
           <v-icon
-            small
             class="mr-2"
             @click="showPaystub(props.item)">
             attach_money
@@ -128,6 +126,12 @@ export default {
         id: item.id,
       };
       this.$emit('itemSave', update);
+    },
+    editPaystub(employee) {
+      this.$router.push({
+        name: 'paystub-edit',
+        params: { payperiod: this.$route.params.payperiod, employee: employee.id },
+      });
     },
     showPaystub(employee) {
       this.$router.push({

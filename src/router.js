@@ -50,6 +50,12 @@ export default new Router({
       props: true,
     },
     {
+      path: '/payperiods/:payperiod/:employee/edit',
+      name: 'paystub-edit',
+      component: () => import(/* webpackChunkName: "payperiod" */ './components/editPayCheck.vue'),
+      props: true,
+    },
+    {
       path: '/payreport',
       name: 'payreport',
       component: () => import(/* webpackChunkName: "about" */ './views/PayReport.vue'),

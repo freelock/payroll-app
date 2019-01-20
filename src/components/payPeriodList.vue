@@ -2,6 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="payPeriods"
+    :pagination="pagination"
     >
       <template slot="items" slot-scope="props">
         <tr>
@@ -41,6 +42,13 @@ export default {
       { text: 'Total', value: 'total' },
       { text: 'Actions', value: 'name', sortable: false },
     ],
+    pagination: {
+      descending: true,
+      page: 1,
+      rowsPerPage: 25,
+      sortBy: 'id',
+      totalItems: 0,
+    },
   }),
   computed: {
     ...mapGetters([
