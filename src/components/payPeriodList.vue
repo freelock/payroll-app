@@ -65,6 +65,7 @@ export default {
     },
     deleteItem(item) {
       const index = this.payPeriods.indexOf(item);
+      // eslint-disable-next-line
       confirm('Are you sure you want to delete this item?') && this.$store.commit('deletePeriod', index);
     },
   },

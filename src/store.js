@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
-import { cloneDeep } from 'lodash.clonedeep';
+// import { cloneDeep } from 'lodash.clonedeep';
 import fwh2019 from './utils/fwh2019';
 import fwh2018 from './utils/fwh2018';
 import fwh2017 from './utils/fwh2017';
@@ -330,7 +330,6 @@ export default new Vuex.Store({
       const result = state.payPeriods.reduce((report, payperiod) => {
         // eslint-disable-next-line
         report = payperiod.employees.reduce((empreport, employee) => {
-          const emp = empreport[employee.id] || {};
           if (!empreport[employee.id]) {
             // eslint-disable-next-line
             empreport[employee.id] = {};
@@ -436,7 +435,8 @@ export default new Vuex.Store({
       employee.totals.total_income_exempt = employee.income.total * notexempt;
       employee.totals.medicare_income = employee.income.total;
       employee.totals.taxable_income = employee.income.taxable - employee.deductions.tax_exempt;
-      employee.totals.taxable_income_exempt = (employee.income.taxable - employee.deductions.tax_exempt) * notexempt;
+      employee.totals.taxable_income_exempt = (employee.income.taxable
+        - employee.deductions.tax_exempt) * notexempt;
       employee.totals.net_income = employee.income.taxable
         - employee.deductions.total - employee.taxes.employee.total;
       employee.totals.hourlyWorked = employee.income.hourlyWorked;
