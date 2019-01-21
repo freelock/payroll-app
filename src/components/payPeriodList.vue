@@ -2,7 +2,8 @@
   <v-data-table
     :headers="headers"
     :items="payPeriods"
-    :pagination="pagination"
+    :defaultPagination="pagination"
+    @update:pagination="pagerUpdate"
     >
       <template slot="items" slot-scope="props">
         <tr>
@@ -76,6 +77,9 @@ export default {
       // eslint-disable-next-line
       confirm('Are you sure you want to delete this item?') && this.$store.commit('deletePeriod', index);
     },
+    pagerUpdate(payload) {
+      this.pagination = payload;
+    }
   },
 
 };

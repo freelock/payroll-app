@@ -3,6 +3,7 @@
     :headers="headers"
     :items="employees"
     :pagination="pagination"
+    @update:pagination="pagerUpdate"
     >
       <template slot="items" slot-scope="props">
         <tr>
@@ -55,6 +56,9 @@ export default {
     editItem(item) {
       this.$emit('edit', item);
     },
+    pagerUpdate(payload) {
+      this.pagination = payload;
+    }
   },
 
 };
