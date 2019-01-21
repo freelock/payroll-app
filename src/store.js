@@ -161,7 +161,7 @@ export default new Vuex.Store({
           name: 'Washington Family/Medical Leave deduction',
           type: 'waFml',
           basis: 'medicare_income',
-          rate: 0.4,
+          rate: 0.004,
           applies: 'employee',
           group: 'esd',
           chart_id: '2167',
