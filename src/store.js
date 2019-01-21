@@ -249,6 +249,11 @@ export default new Vuex.Store({
                 amount: Math.round(fwh(empRates[tax.id], (payCheck.totals[tax.basis] / 100)) * 100),
               }).getAmount();
               break;
+            case 'waFml':
+              // formula is 0.04% of basis, up to cap for total -- then employee pays 63.33% of that.
+              const fmlTotal = basis.multiply(0.004);
+              taxes.employee[tax.id] = fmlTotal.multiply('0.6333').getAmount();
+              break;
             default:
           }
           if (tax.applies === 'employee') {
@@ -536,14 +541,14 @@ export default new Vuex.Store({
       commit('addPayPeriod', payPeriod);
     },
     /**
-     * Update the calculated payroll values
+     * Update the calculated payroll values when hours change
      * @param {*} context
      * @param {*} payload - contains payperiod, id, field, value
      */
     calculate(context, payload) {
-      context.commit('updateHours', payload);
       const payPeriod = context.getters.getPayperiod(payload);
       const payCheck = payPeriod.employees.find(e => e.id === payload.id);
+      context.commit('updateHours', payload);
       let employerTaxes = payPeriod.employer;
       if (!employerTaxes) {
         employerTaxes = {};
@@ -587,6 +592,9 @@ export default new Vuex.Store({
       };
       context.commit('updateHours', updateField);
 
+      if (payCheck.override) {
+        throw new Error('Hours changed but deductions/taxes have been modified.');
+      }
       // Now calculate deductions.
       const deductions = context.getters.calculateDeductions(payCheck);
       updateField.field = 'deductions';

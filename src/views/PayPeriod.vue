@@ -1,9 +1,16 @@
 <template>
   <div class="payperiod">
-    <h1>{{ payperiod }}</h1>
+  <v-toolbar flat color="white">
+      <v-toolbar-title>{{ payperiod }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn @click.native="confirmPayperiod"
+        color="primary"
+        v-show="!selected.confirmed">Confirm payroll</v-btn>
+  </v-toolbar>
     <payroll-list
       :employees="employees"
       @itemSave="save"
+      :confirmed="selected.confirmed"
       >
     </payroll-list>
   </div>
@@ -40,6 +47,14 @@ export default {
         payperiod: this.payperiod,
       };
       this.$store.dispatch('calculate', data);
+    },
+    confirmPayperiod() {
+      const period = {
+        ...this.selected,
+        confirmed: true,
+      }
+      console.log(period);
+      this.$store.commit('updatePayPeriod', period);
     },
   },
 };

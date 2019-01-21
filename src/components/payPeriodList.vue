@@ -13,6 +13,14 @@
           <td class="justify-center layout px-0">
           <v-icon
             class="mr-2"
+            v-show="props.item.confirmed"
+            @click="editItem(props.item)"
+          >
+            search
+          </v-icon>
+          <v-icon
+            class="mr-2"
+            v-show="!props.item.confirmed"
             @click="editItem(props.item)"
           >
             edit

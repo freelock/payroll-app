@@ -108,6 +108,11 @@
             <td class="value">{{ payDataTotals.taxes.lni | currency }}</td>
           </tr>
           <tr>
+            <td class="item">Washington Family/Medical Leave</td>
+            <td class="value">{{ payStubData.taxes.employee.waFmlEe | currency }}</td>
+            <td class="value">{{ payDataTotals.taxes.waFmlEe | currency }}</td>
+          </tr>
+          <tr>
             <th class="item">Total tax</th>
             <th class="value">{{ payStubData.taxes.employee.total | currency }}</th>
             <th class="value">{{ payDataTotals.taxes.total | currency }}</th>

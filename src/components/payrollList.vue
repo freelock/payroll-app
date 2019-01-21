@@ -10,6 +10,7 @@
           <td class="hours">
             <v-text-field
               slot="input"
+              v-show="!confirmed"
               v-model.lazy="props.item.hours"
               single-line
               @change="save('hours', props.item)"
@@ -21,6 +22,7 @@
           <td>
             <v-text-field
               slot="input"
+              v-show="!confirmed"
               v-model.lazy="props.item.overtime"
               single-line
               @change="save('overtime', props.item)"
@@ -32,6 +34,7 @@
           <td>
             <v-text-field
               slot="input"
+              v-show="!confirmed"
               v-model.lazy="props.item.ptoUsed"
               single-line
               @change="save('ptoUsed', props.item)"
@@ -43,6 +46,7 @@
           <td>
             <v-text-field
               slot="input"
+              v-show="!confirmed"
               v-model.lazy="props.item.holidayUsed"
               single-line
               @change="save('holidayUsed', props.item)"
@@ -54,6 +58,7 @@
           <td>
             <v-text-field
               slot="input"
+              v-show="!confirmed"
               v-model.lazy="props.item.bonus"
               single-line
               @change="save('bonus', props.item)"
@@ -69,6 +74,7 @@
           <td class="justify-center layout px-0">
           <v-icon
             class="mr-2"
+            v-show="!confirmed"
             @click="editPaystub(props.item)"
           >
             edit
@@ -93,6 +99,7 @@ import Dinero from 'dinero.js';
 export default {
   props: [
     'employees',
+    'confirmed', // Read-only flag
   ],
   data: () => ({
     headers: [
