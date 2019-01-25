@@ -2,7 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="payPeriods"
-    :defaultPagination="pagination"
+    :pagination="pagination"
     @update:pagination="pagerUpdate"
     >
       <template slot="items" slot-scope="props">
