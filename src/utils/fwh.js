@@ -30,10 +30,13 @@ const allowance = 172.9;
 const fwh = (allowances, taxableIncome) => {
   const table = allowances.substring(0, 1).toLowerCase();
   const allow = allowances.substring(1);
-  const taxable = taxableIncome - (allow * allowance);
+  let taxable = taxableIncome - (allow * allowance);
+  if (taxable < 0) {
+    taxable = 0;
+  }
 
   const { bracket } = semimonthly[table].reduce((result, row) => {
-    if (row.min < taxable) {
+    if (row.min <= taxable) {
       // eslint-disable-next-line
       result.bracket = row;
     }
