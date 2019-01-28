@@ -362,16 +362,16 @@ export default new Vuex.Store({
       let ptoNet = 0;
       let ptoHours = 0;
       let retirement = 0;
-      if (payCheck.hours || payCheck.ptoHours) {
+      if (payCheck.hours > 0 || payCheck.ptoHours > 0) {
         if (empRates.salary > 0) {
           ptoHours = 83.33 - payCheck.ptoUsed;
           if (ptoHours < 0) {
             ptoHours = 0;
           }
         } else {
-          ptoHours = (payCheck.hours * 1) + (payCheck.overtime * 1);
+          ptoHours = (payCheck.hours * 1) + (payCheck.overtime * 1) + (payCheck.holidayUsed * 1);
         }
-        ptoNet += Math.round(ptoHours * empRates.ptoRate * 100) / 100;
+        ptoNet += Math.round(ptoHours * empRates.ptoRate * 1000) / 1000;
         ptoNet -= payCheck.ptoUsed;
 
         retirement += empRates.retirement * 1;
@@ -646,6 +646,7 @@ export default new Vuex.Store({
         year,
         quarter: `${year}-Q${quarter}`,
         month: `${year}-${month}`,
+        confirmed: false,
         ...payload,
       };
       commit('addPayPeriod', payPeriod);

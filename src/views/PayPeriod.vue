@@ -6,6 +6,9 @@
       <v-btn @click.native="confirmPayperiod"
         color="primary"
         v-show="!selected.confirmed">Confirm payroll</v-btn>
+      <v-btn @click.native="unconfirmPayperiod"
+        color="primary"
+        v-show="selected.confirmed">UnConfirm payroll</v-btn>
   </v-toolbar>
     <payroll-list
       :employees="employees"
@@ -52,6 +55,14 @@ export default {
       const period = {
         ...this.selected,
         confirmed: true,
+      }
+      console.log(period);
+      this.$store.commit('updatePayPeriod', period);
+    },
+    unconfirmPayperiod() {
+      const period = {
+        ...this.selected,
+        confirmed: false,
       }
       console.log(period);
       this.$store.commit('updatePayPeriod', period);
