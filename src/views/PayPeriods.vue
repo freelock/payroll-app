@@ -24,17 +24,23 @@
         <v-text-field
           slot="activator"
           v-model="createId"
+        v-show="payperiodsLoaded"
           prepend-icon="event"
           readonly
         ></v-text-field>
-        <v-date-picker v-model="createId" @input="$refs.menu2.save(createId)"></v-date-picker>
+        <v-date-picker v-model="createId"
+        v-show="payperiodsLoaded"
+        @input="$refs.menu2.save(createId)"></v-date-picker>
       </v-menu>
       <v-btn color="primary" dark class="mb-2"
+        v-show="payperiodsLoaded"
         @click.native="newPayPeriod">
         New pay period
       </v-btn>
       <v-btn @click.native="loadServer" color="primary">Load</v-btn>
-      <v-btn @click.native="saveServer" color="primary">Save</v-btn>
+      <v-btn @click.native="saveServer"
+        v-show="payperiodsLoaded"
+        color="primary">Save</v-btn>
   </v-toolbar>
     <pay-period-list
       :payPeriods="payPeriods"
@@ -45,7 +51,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import payPeriodList from '../components/payPeriodList.vue';
 
 export default {
@@ -64,6 +70,10 @@ export default {
   computed: {
     ...mapState([
       'payPeriods',
+    ]),
+    ...mapGetters([
+      'employeesLoaded',
+      'payperiodsLoaded',
     ]),
     formTitle() {
       return this.editedInstance === -1 ? 'New Pay Period' : 'Edit Pay Period';

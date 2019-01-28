@@ -11,11 +11,16 @@
         <div v-show="!employeeData.rates.salary">Hourly: 
           {{ employeeData.rates.hourlyRate * 100| currency }}</div>
         <div>Witholdings: {{ employeeData.rates.FWH }}</div>
-        <div>PTO balance: {{ employeeData.ptoBalance }} hours</div>
         <div>PTO accrual rate: {{ employeeData.rates.ptoRate }} per hour worked</div>
-        <h2>Deductions</h2>
-        <div></div>
-        <div></div>
+        <h2>Hours</h2>
+        <div>{{ payStubData.hours }} Regular hours</div>
+        <div>{{ payStubData.ptoUsed }} PTO</div>
+        <div>{{ payStubData.holidayUsed }} Holiday</div>
+        <div>{{ payDataTotals.income.hourlyWorked }} YTD hours worked</div>
+        <div>{{ payDataTotals.income.hourlyTotal }} YTD Total hours</div>
+        <h2>Balances</h2>
+        <div>PTO balance: {{ payDataTotals.accounts.ptoNet }} hours</div>
+        <div>Total Retirement contribution: {{ payDataTotals.accounts.retirement | currency }}</div>
       </div>
       <div>
         <h2>Income</h2>
@@ -66,7 +71,17 @@
           </tr>
           <tr v-show="payDataTotals.deductions.health">
             <td class="item">Health plan</td>
-            <td class="value">{{ payStubData.deductions.health | currency }}</td>
+            <td class="value">
+            <money
+              :value="health"
+              @input="updateHealth"
+              v-bind="money"
+              width="10"
+              class="dollars"
+              prefix="$"
+              suffix=" USD"
+            ></money>
+              </td>
             <td class="value">{{ payDataTotals.deductions.health | currency }}</td>
           </tr>
           <tr v-show="payDataTotals.deductions.retirement">
@@ -80,7 +95,11 @@
             <th class="value">{{ taxable | currency }}</th>
           </tr>
         </table>
-        <h2>Taxes</h2>
+        <h2>Taxes<span 
+          class="override"
+          v-show="payStubData.override"
+          >Overridden</span>
+        </h2>
         <table class="paytable">
           <tr>
             <th class="item">Item</th>
@@ -89,7 +108,17 @@
           </tr>
           <tr>
             <td class="item">FWH</td>
-            <td class="value">{{ payStubData.taxes.employee.FWH | currency }}</td>
+            <td class="value">
+            <money
+              :value="fwh"
+              @input="updateFwh"
+              v-bind="money"
+              width="12"
+              class="dollars"
+              prefix="$"
+              suffix=" USD"
+            ></money>
+              </td>
             <td class="value">{{ payDataTotals.taxes.FWH | currency }}</td>
           </tr>
           <tr>
@@ -104,7 +133,17 @@
           </tr>
           <tr>
             <td class="item">Labor & Industries</td>
-            <td class="value">{{ payStubData.taxes.employee.lni | currency }}</td>
+            <td class="value">
+            <money
+              :value="lni"
+              @input="updateLni"
+              v-bind="money"
+              width="10"
+              class="dollars"
+              prefix="$"
+              suffix=" USD"
+            ></money>
+              </td>
             <td class="value">{{ payDataTotals.taxes.lni | currency }}</td>
           </tr>
           <tr>
@@ -157,16 +196,24 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { Money } from 'v-money';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import { setTimeout } from 'core-js';
 
 export default {
   props: [
     'payperiod',
     'employee',
   ],
-  data: () => ({
-
-  }),
+  data() {
+    return {
+      money: {
+        prefix: '',
+        masked: false,
+      },
+      debounceTimeout: null,
+    }
+  },
   computed: {
     ...mapState([
       'employees',
@@ -177,6 +224,15 @@ export default {
     ]),
     employeeData() {
       return this.employees.find(item => this.employee === item.id);
+    },
+    fwh() {
+      return this.payStubData.taxes.employee.FWH / 100;
+    },
+    lni() {
+      return this.payStubData.taxes.employee.lni / 100;
+    },
+    health() {
+      return this.payStubData.deductions.health / 100;
     },
     payDataTotals() {
       return this.employeeCalc[this.employee];
@@ -199,14 +255,49 @@ export default {
       return this.payDataTotals.income.total
         - this.payDataTotals.deductions.total - this.payDataTotals.taxes.total;
     },
+    
   },
   methods: {
+    ...mapActions([
+      'updatePayStub',
+    ]),
+    updateFwh(value) {
+      const origValue = this.payStubData.taxes.employee.FWH;
+      this.update('fwh', origValue, value);
+    },
+    updateLni(value) {
+      const origValue = this.payStubData.taxes.employee.lni;
+      this.update('lni', origValue, value);
+    },
+    updateHealth(value) {
+      const origValue = this.payStubData.deductions.health;
+      this.update('health', origValue, value);
+    },
+    update(field, origValue, value) {
+      if (origValue && (Math.round(value * 100) !== origValue)) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+      const self = this;
+      this.debounceTimeout = setTimeout(function () {
+        console.log(value, origValue);
+        const data = {
+          paystub: self.payStubData,
+          field,
+          value,
+        }
+        self.updatePayStub(data);
+      }, 1000);
+      }
+    },
     navToPayperiod() {
       this.$router.push({
         name: 'payperiod',
         params: { payperiod: this.$route.params.payperiod },
       });
     },
+  },
+  components: {
+    money: Money,
   },
 };
 </script>
@@ -216,7 +307,12 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
-
+.override {
+  text-align: right;
+  font-weight: normal;
+  color: red;
+  font-size: 0.5em;
+}
 .paytable {
   width: 100%;
   border: 1px solid #cccccc;
@@ -224,7 +320,7 @@ export default {
 .item {
   text-align: left;
 }
-.value {
+.dollars, .value {
   text-align: right;
 }
 </style>

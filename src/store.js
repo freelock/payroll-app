@@ -171,8 +171,12 @@ export default new Vuex.Store({
         {
           id: 'ptoBalance',
           name: 'PTO Balance',
-          type: 'calculated',
-          chart_id: '2533',
+          type: 'hours',
+        },
+        {
+          id: 'retirementBalance',
+          name: 'Retirement Balance',
+          type: 'money',
         },
       ],
     },
@@ -205,6 +209,7 @@ export default new Vuex.Store({
               due: 0,
             },
           },
+          override: false,
           totals: {
             total_income: 0,
             medicare_income: 0,
@@ -219,10 +224,18 @@ export default new Vuex.Store({
     getEmployeeById: state => id => state.employees.find(e => e.id === id),
     getPayperiod: state => payload =>
       state.payPeriods.find(pp => pp.id === payload.payperiod),
+    employeesLoaded: state => state.employees.length > 0,
+    payperiodsLoaded: state => state.payPeriods.length > 0,
+    yearToDate: (state, getters) => (year) => {
+      if (getters.payperiodsLoaded) {
+        return state.payPeriods.filter(pp => pp.year === year);
+      }
+      return [];
+    },
     /**
      * Calculate taxes.
      */
-    calculateTaxes: (state, getters) => (payCheck) => {
+    calculateTaxes: (state, getters) => (paystub) => {
       const taxes = {
         employee: {
           total: 0,
@@ -231,12 +244,32 @@ export default new Vuex.Store({
           due: 0,
         },
       };
-      const empRates = getters.getEmployeeById(payCheck.id).rates;
+      if (paystub.override) {
+        // Recalculate totals only.
+        Object.keys(paystub.taxes.employee).map((tax) => {
+          if (tax !== 'total') {
+            taxes.employee[tax] = paystub.taxes.employee[tax];
+            taxes.employee.total += paystub.taxes.employee[tax];
+            taxes.employer.due += paystub.taxes.employee[tax];
+          }
+          return tax;
+        });
+        Object.keys(paystub.taxes.employer).map((tax) => {
+          if (tax !== 'due') {
+            taxes.employer[tax] = paystub.taxes.employer[tax];
+            taxes.employer.due += paystub.taxes.employee[tax];
+          }
+          return tax;
+        });
+        return taxes;
+      }
+      const empRates = getters.getEmployeeById(paystub.id).rates;
       state.lineItems.taxes.map((tax) => {
         if (empRates[tax.id]) {
-          const basis = Dinero({ amount: Math.round(payCheck.totals[tax.basis]) });
-          let fwh = payCheck.payperiod <= '2018-02' ? fwh2017 : fwh2018;
-          if (payCheck.payperiod > '2019-01') {
+          const basis = Dinero({ amount: Math.round(paystub.totals[tax.basis]) });
+          let fwh = paystub.payperiod <= '2018-02' ? fwh2017 : fwh2018;
+          let fmlTotal = 0;
+          if (paystub.payperiod > '2019-01') {
             fwh = fwh2019;
           }
           const total = Dinero({ amount: taxes.employee.total });
@@ -246,12 +279,13 @@ export default new Vuex.Store({
               break;
             case 'fwh':
               taxes.employee[tax.id] = Dinero({
-                amount: Math.round(fwh(empRates[tax.id], (payCheck.totals[tax.basis] / 100)) * 100),
+                amount: Math.round(fwh(empRates[tax.id], (paystub.totals[tax.basis] / 100)) * 100),
               }).getAmount();
               break;
             case 'waFml':
-              // formula is 0.04% of basis, up to cap for total -- then employee pays 63.33% of that.
-              const fmlTotal = basis.multiply(0.004);
+              // formula is 0.04% of basis, up to cap for total --
+              // then employee pays 63.33% of that.
+              fmlTotal = basis.multiply(0.004);
               taxes.employee[tax.id] = fmlTotal.multiply('0.6333').getAmount();
               break;
             default:
@@ -312,6 +346,45 @@ export default new Vuex.Store({
       return deductions;
     },
 
+    /**
+     * Calculate account transactions:
+     * + PTORate * hours worked
+     * - PTOUsed
+     * + PTOStarting
+     * + Retirement deduction
+     * + Retirement match
+     * +- PTONet
+     * +- Retirement
+     */
+    calculateAccounts: (state, getters) => (payCheck) => {
+      const empRates = getters.getEmployeeById(payCheck.id).rates;
+      const accounts = {};
+      let ptoNet = 0;
+      let ptoHours = 0;
+      let retirement = 0;
+      if (payCheck.hours || payCheck.ptoHours) {
+        if (empRates.salary > 0) {
+          ptoHours = 83.33 - payCheck.ptoUsed;
+          if (ptoHours < 0) {
+            ptoHours = 0;
+          }
+        } else {
+          ptoHours = (payCheck.hours * 1) + (payCheck.overtime * 1);
+        }
+        ptoNet += Math.round(ptoHours * empRates.ptoRate * 100) / 100;
+        ptoNet -= payCheck.ptoUsed;
+
+        retirement += empRates.retirement * 1;
+      } else {
+        // balance transaction
+        ptoNet = payCheck.ptoBalance;
+        retirement = payCheck.retirementBalance;
+      }
+      accounts.ptoNet = ptoNet;
+      accounts.retirement = retirement * 1;
+      return accounts;
+    },
+
     employerMonth: (state, getters) => getters.employerCalc('month'),
     employerQuarter: (state, getters) => getters.employerCalc('quarter'),
     employerYear: (state, getters) => getters.employerCalc('year'),
@@ -331,8 +404,8 @@ export default new Vuex.Store({
       return result;
     },
 
-    employeeCalc: (state) => {
-      const result = state.payPeriods.reduce((report, payperiod) => {
+    employeeCalc: (state, getters) => {
+      const result = getters.yearToDate(config.CURRENT_YEAR).reduce((report, payperiod) => {
         // eslint-disable-next-line
         report = payperiod.employees.reduce((empreport, employee) => {
           if (!empreport[employee.id]) {
@@ -367,13 +440,28 @@ export default new Vuex.Store({
               current[item] = value + employee.deductions[item];
               return current;
             }, values);
+          if (!employee.accounts) {
+            // eslint-disable-next-line
+            empreport[employee.id].accounts = {
+              ptoNet: 0,
+              retirement: 0,
+            };
+          } else {
+            // eslint-disable-next-line
+            empreport[employee.id].accounts = Object.keys(employee.accounts)
+              .reduce((current, item) => {
+                const value = current[item] || 0;
+                // eslint-disable-next-line
+                current[item] = value + employee.accounts[item];
+                return current;
+              }, values);
+          }
           return empreport;
         }, report);
         return report;
       }, {});
       return result;
     },
-
   },
   mutations: {
     retrieveToken(state, { token, username }) {
@@ -429,6 +517,28 @@ export default new Vuex.Store({
       const myState = state;
       myState.payPeriods = state.payPeriods.map(p => (p.id === payload.id ? payload : p));
       myState.dirty = true;
+    },
+    /**
+     * Payload has payperiod, paystub
+     */
+    updatePayStub: (state, payload) => {
+      const myPayperiod = state.payPeriods.find(pp => pp.id === payload.paystub.payperiod);
+      const myPaystub = myPayperiod.employees.find(emp => emp.id === payload.paystub.id);
+      const { taxes } = myPaystub;
+      switch (payload.field) {
+        case 'fwh':
+          taxes.employee.FWH = Math.round(payload.value * 100);
+          break;
+        case 'lni':
+          taxes.employee.lni = Math.round(payload.value * 100);
+          break;
+        case 'health':
+          myPaystub.deductions.health = Math.round(payload.value * 100);
+          break;
+        default:
+          throw new Error(`Attempt to modify unsupported value: ${payload.field}`);
+      }
+      myPaystub.override = true;
     },
     updateHours: (state, payload) => {
       const payperiod = state.payPeriods.find(pp => pp.id === payload.payperiod);
@@ -567,8 +677,8 @@ export default new Vuex.Store({
         salary = salary.subtract(total);
         total = Dinero({ amount: Math.round(empRates.salary / 0.24) });
         income.salary = salary.getAmount();
-        income.hourlyWorked = 80 - payCheck.ptoUsed - payCheck.holidayUsed;
-        income.hourlyTotal = 80;
+        income.hourlyWorked = 83.33 - payCheck.ptoUsed - payCheck.holidayUsed;
+        income.hourlyTotal = 83.33;
       } else {
         const hours = Dinero({ amount: Math.round(payCheck.hours * hourly * 100) });
         const overtime = Dinero({ amount: Math.round(payCheck.overtime * hourly * 150) });
@@ -606,21 +716,29 @@ export default new Vuex.Store({
       updateField.field = 'taxes';
       updateField.value = taxes;
       context.commit('updateHours', updateField);
-      // Add taxes to payroll total.
-      /* employerTaxes = Object.keys(taxes).reduce((totals, taxType) => {
-        if (totals[taxType]) {
-          totals[taxType] = Object.keys(taxes[taxType])
-            .map(tax => totals[taxType][tax] + taxes[taxType][tax]);
-          return totals;
-        }
-        totals[taxType] = taxes[taxType];
-        return totals;
-      }, employerTaxes);
-      const employerTax = {
+
+      // Finally, accounts.
+      const accounts = context.getters.calculateAccounts(payCheck);
+      updateField.field = 'accounts';
+      updateField.value = accounts;
+      context.commit('updateHours', updateField);
+    },
+    /**
+     * Edit a tax deduction to match previously paid
+     * @param {*} context
+     * @param {*} payload - contains paystub, field, value
+     */
+    updatePayStub({ getters, commit }, payload) {
+      commit('updatePayStub', payload);
+      const taxes = getters.calculateTaxes(payload.paystub);
+      const updateField = {
         ...payload,
-        employer: employerTaxes,
+        payperiod: payload.paystub.payperiod,
+        id: payload.paystub.id,
+        field: 'taxes',
+        value: taxes,
       };
-      context.commit('updateEmployer', employerTax); */
+      commit('updateHours', updateField);
     },
     async loadEmployees(context) {
       axios.defaults.headers.common.Authorization = `Bearer ${context.state.token}`;
