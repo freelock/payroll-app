@@ -8,11 +8,16 @@
         <div v-show="employeeData.rates.salary">Salary: {{ employeeData.rates.salary * 100| currency }}</div>
         <div v-show="!employeeData.rates.salary">Hourly: {{ employeeData.rates.hourlyRate * 100| currency }}</div>
         <div>Witholdings: {{ employeeData.rates.FWH }}</div>
-        <div>PTO balance: {{ employeeData.ptoBalance }} hours</div>
         <div>PTO accrual rate: {{ employeeData.rates.ptoRate }} per hour worked</div>
-        <h2>Deductions</h2>
-        <div></div>
-        <div></div>
+        <h2>Hours</h2>
+        <div>{{ payStubData.hours }} Regular hours</div>
+        <div>{{ payStubData.ptoUsed }} PTO</div>
+        <div>{{ payStubData.holidayUsed }} Holiday</div>
+        <div>{{ payDataTotals.income.hourlyWorked }} YTD hours worked</div>
+        <div>{{ payDataTotals.income.hourlyTotal }} YTD Total hours</div>
+        <h2>Balances</h2>
+        <div>PTO balance: {{ payDataTotals.accounts.ptoNet }} hours</div>
+        <div>Total Retirement contribution: {{ payDataTotals.accounts.retirement | currency }}</div>
       </div>
       <div>
         <h2>Income</h2>
@@ -170,16 +175,19 @@ export default {
     ]),
     ...mapGetters([
       'employeeCalc',
+      'employeeCalcPeriod',
     ]),
     employeeData() {
       return this.employees.find(item => this.employee === item.id);
     },
     payDataTotals() {
-      return this.employeeCalc[this.employee];
+      return this.employeeCalcPeriod(this.pp.year, this.payperiod)[this.employee];
+    },
+    pp() {
+      return this.payPeriods.find(item => this.payperiod === item.id);
     },
     payStubData() {
-      const pp = this.payPeriods.find(item => this.payperiod === item.id);
-      return pp.employees.find(item => this.employee === item.id);
+      return this.pp.employees.find(item => this.employee === item.id);
     },
     gross() {
       let gross = this.payDataTotals.income.salary || 0;

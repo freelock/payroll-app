@@ -226,9 +226,10 @@ export default new Vuex.Store({
       state.payPeriods.find(pp => pp.id === payload.payperiod),
     employeesLoaded: state => state.employees.length > 0,
     payperiodsLoaded: state => state.payPeriods.length > 0,
-    yearToDate: (state, getters) => (year) => {
+    yearToDate: (state, getters) => (year, dt) => {
+      const id = dt || `${year}-12-31`;
       if (getters.payperiodsLoaded) {
-        return state.payPeriods.filter(pp => pp.year === year);
+        return state.payPeriods.filter(pp => pp.year === year && pp.id <= id);
       }
       return [];
     },
@@ -374,7 +375,9 @@ export default new Vuex.Store({
         ptoNet += Math.round(ptoHours * empRates.ptoRate * 1000) / 1000;
         ptoNet -= payCheck.ptoUsed;
 
-        retirement += empRates.retirement * 1;
+        if (empRates.retirement && empRates.retirement > 0) {
+          retirement += empRates.retirement * 1;
+        }
       } else {
         // balance transaction
         ptoNet = payCheck.ptoBalance;
@@ -403,9 +406,12 @@ export default new Vuex.Store({
       }, {});
       return result;
     },
-
     employeeCalc: (state, getters) => {
-      const result = getters.yearToDate(config.CURRENT_YEAR).reduce((report, payperiod) => {
+      return getters.employeeCalcPeriod(config.CURRENT_YEAR);
+    },
+
+    employeeCalcPeriod: (state, getters) => (year, id) => {
+      const result = getters.yearToDate(year, id).reduce((report, payperiod) => {
         // eslint-disable-next-line
         report = payperiod.employees.reduce((empreport, employee) => {
           if (!empreport[employee.id]) {
@@ -440,22 +446,17 @@ export default new Vuex.Store({
               current[item] = value + employee.deductions[item];
               return current;
             }, values);
-          if (!employee.accounts) {
-            // eslint-disable-next-line
-            empreport[employee.id].accounts = {
-              ptoNet: 0,
-              retirement: 0,
-            };
-          } else {
-            // eslint-disable-next-line
-            empreport[employee.id].accounts = Object.keys(employee.accounts)
-              .reduce((current, item) => {
-                const value = current[item] || 0;
-                // eslint-disable-next-line
-                current[item] = value + employee.accounts[item];
-                return current;
-              }, values);
-          }
+
+          values = empreport[employee.id].accounts || {};
+          const accts = employee.accounts || {};
+          // eslint-disable-next-line
+          empreport[employee.id].accounts = Object.keys(accts)
+            .reduce((current, item) => {
+              const value = current[item] || 0;
+              // eslint-disable-next-line
+              current[item] = Math.round((value + employee.accounts[item]) * 1000) / 1000;
+              return current;
+            }, values);
           return empreport;
         }, report);
         return report;

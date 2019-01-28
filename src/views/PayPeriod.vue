@@ -8,7 +8,7 @@
         v-show="!selected.confirmed">Confirm payroll</v-btn>
       <v-btn @click.native="unconfirmPayperiod"
         color="primary"
-        v-show="selected.confirmed">UnConfirm payroll</v-btn>
+        v-show="selected.unconfirmed">UnConfirm payroll</v-btn>
   </v-toolbar>
     <payroll-list
       :employees="employees"
