@@ -406,13 +406,11 @@ export default new Vuex.Store({
       }, {});
       return result;
     },
-    employeeCalc: (state, getters) => {
-      return getters.employeeCalcPeriod(config.CURRENT_YEAR);
-    },
 
-    employeeCalcTax: (state, getters) => {
-      return getters.employeeCalcPeriod(config.LAST_YEAR);
-    },
+    employeeCalc: (state, getters) => getters.employeeCalcPeriod(config.CURRENT_YEAR),
+
+    employeeCalcTax: (state, getters) => getters.employeeCalcPeriod(config.LAST_YEAR),
+
     employeeCalcPeriod: (state, getters) => (year, id) => {
       const result = getters.yearToDate(year, id).reduce((report, payperiod) => {
         // eslint-disable-next-line

@@ -1,12 +1,15 @@
 <template>
   <div>
-    <v-btn @click.native="navToPayperiod" color="primary">Go back to {{ payperiod }} pay period</v-btn>
+    <v-btn @click.native="navToPayperiod" color="primary">Go back to
+      {{ payperiod }} pay period</v-btn>
     <h1>{{ payperiod }} Paystub for {{ employee | capitalize }}</h1>
     <div class="columns">
       <div>
         <div>Class: {{ employeeData.class | capitalize }}</div>
-        <div v-show="employeeData.rates.salary">Salary: {{ employeeData.rates.salary * 100| currency }}</div>
-        <div v-show="!employeeData.rates.salary">Hourly: {{ employeeData.rates.hourlyRate * 100| currency }}</div>
+        <div v-show="employeeData.rates.salary">Salary:
+           {{ employeeData.rates.salary * 100| currency }}</div>
+        <div v-show="!employeeData.rates.salary">Hourly:
+          {{ employeeData.rates.hourlyRate * 100| currency }}</div>
         <div>Witholdings: {{ employeeData.rates.FWH }}</div>
         <div>PTO accrual rate: {{ employeeData.rates.ptoRate }} per hour worked</div>
         <h2>Hours</h2>
@@ -29,7 +32,8 @@
           </tr>
           <tr>
             <td class="item">Salary/Hours</td>
-            <td class="value">{{ (payStubData.income.salary || payStubData.income.hours) | currency}}</td>
+            <td class="value">{{ (payStubData.income.salary ||
+              payStubData.income.hours) | currency}}</td>
             <td class="value">{{ gross | currency}}</td>
           </tr>
           <tr v-show="payDataTotals.income.overtime">
@@ -200,7 +204,8 @@ export default {
       return this.payDataTotals.income.taxable - this.payDataTotals.deductions.tax_exempt;
     },
     net() {
-      return this.payDataTotals.income.total - this.payDataTotals.deductions.total - this.payDataTotals.taxes.total;
+      return this.payDataTotals.income.total - this.payDataTotals.deductions.total -
+        this.payDataTotals.taxes.total;
     },
   },
   methods: {

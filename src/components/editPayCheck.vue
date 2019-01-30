@@ -6,9 +6,9 @@
     <div class="columns">
       <div>
         <div>Class: {{ employeeData.class | capitalize }}</div>
-        <div v-show="employeeData.rates.salary">Salary: 
+        <div v-show="employeeData.rates.salary">Salary:
           {{ employeeData.rates.salary * 100| currency }}</div>
-        <div v-show="!employeeData.rates.salary">Hourly: 
+        <div v-show="!employeeData.rates.salary">Hourly:
           {{ employeeData.rates.hourlyRate * 100| currency }}</div>
         <div>Witholdings: {{ employeeData.rates.FWH }}</div>
         <div>PTO accrual rate: {{ employeeData.rates.ptoRate }} per hour worked</div>
@@ -95,7 +95,7 @@
             <th class="value">{{ taxable | currency }}</th>
           </tr>
         </table>
-        <h2>Taxes<span 
+        <h2>Taxes<span
           class="override"
           v-show="payStubData.override"
           >Overridden</span>
@@ -212,7 +212,7 @@ export default {
         masked: false,
       },
       debounceTimeout: null,
-    }
+    };
   },
   computed: {
     ...mapState([
@@ -255,7 +255,7 @@ export default {
       return this.payDataTotals.income.total
         - this.payDataTotals.deductions.total - this.payDataTotals.taxes.total;
     },
-    
+
   },
   methods: {
     ...mapActions([
@@ -275,18 +275,17 @@ export default {
     },
     update(field, origValue, value) {
       if (origValue && (Math.round(value * 100) !== origValue)) {
-      clearTimeout(this.debounceTimeout);
-      this.debounceTimeout = null;
-      const self = this;
-      this.debounceTimeout = setTimeout(function () {
-        console.log(value, origValue);
-        const data = {
-          paystub: self.payStubData,
-          field,
-          value,
-        }
-        self.updatePayStub(data);
-      }, 1000);
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = null;
+        const self = this;
+        this.debounceTimeout = setTimeout(() => {
+          const data = {
+            paystub: self.payStubData,
+            field,
+            value,
+          };
+          self.updatePayStub(data);
+        }, 1000);
       }
     },
     navToPayperiod() {
