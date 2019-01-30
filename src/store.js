@@ -448,6 +448,16 @@ export default new Vuex.Store({
               return current;
             }, values);
 
+          values = empreport[employee.id].totals || {};
+          // eslint-disable-next-line
+          empreport[employee.id].totals = Object.keys(employee.totals)
+            .reduce((current, item) => {
+              const value = current[item] || 0;
+              // eslint-disable-next-line
+              current[item] = value + employee.totals[item];
+              return current;
+            }, values);
+            
           values = empreport[employee.id].accounts || {};
           const accts = employee.accounts || {};
           // eslint-disable-next-line

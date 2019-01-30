@@ -66,5 +66,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Report.vue'),
       props: true,
     },
+    {
+      path: '/w2/:periods/:period',
+      name: 'w2',
+      component: () => import(/* webpackChunkName: "about" */ './views/w2.vue'),
+      props: true,
+    },
   ],
 });

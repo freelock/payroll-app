@@ -11,22 +11,32 @@
       <tr>
         <td class="item">Federal Income Tax</td>
         <td class="value">{{ amounts.FWH | currency }} </td>
+        <td>Taxable income</td>
+        <td class="value">{{ amounts.taxable_income | currency }} </td>
       </tr>
       <tr>
         <td class="item">Social Security - Employee</td>
         <td class="value">{{ amounts.ssEe | currency}} </td>
+        <td>Medicare income</td>
+        <td class="value">{{ amounts.medicare_income | currency }} </td>
       </tr>
       <tr>
         <td class="item">Social Security - Employer</td>
         <td class="value">{{ amounts.ssEr | currency }} </td>
-      </tr>
+        <td>Total:</td>
+        <td class="value">{{ ssTotal | currency }}</td>
       <tr>
+      </tr>
         <td class="item">Medicare - Employee</td>
         <td class="value">{{ amounts.medEe | currency }} </td>
+        <td>Medicare income</td>
+        <td class="value">{{ amounts.medicare_income | currency }} </td>
       </tr>
       <tr>
         <td class="item">Medicare - Employer</td>
         <td class="value">{{ amounts.medEr | currency }} </td>
+        <td>Total:</td>
+        <td class="value">{{ medTotal |currency }}</td>
       </tr>
       <tr>
         <th class="item">Totals</th>
@@ -125,6 +135,12 @@ export default {
     amounts() {
       const func = 'employer' + this.$options.filters.capitalize(this.periods);
       return this[func][this.period];
+    },
+    medTotal() {
+      return this.amounts.medEe + this.amounts.medEr;
+    },
+    ssTotal() {
+      return this.amounts.ssEe + this.amounts.ssEr;
     },
     t941() {
       const amounts = this.amounts;

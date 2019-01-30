@@ -32,10 +32,12 @@
     <table class="paytable">
       <tr>
         <th class="item">Period</th>
+        <th class="item">Wages</th>
         <th class="value">Total payroll</th>
       </tr>
       <tr v-for="(year, index) in years" :key="index">
         <td class="item"><router-link :to="{ name: 'report', params: { periods: 'year', period: year } }">{{ year }}</router-link></td>
+        <td class="item"><router-link :to="{ name: 'w2', params: { periods: 'year', period: year } }">{{ year }}</router-link></td>
         <td class="value">{{ employerYear[year].total_income | currency }}</td>
       </tr>
     </table>

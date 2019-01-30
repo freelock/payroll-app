@@ -79,7 +79,7 @@ export default {
     },
     pagerUpdate(payload) {
       this.pagination = payload;
-    }
+    },
   },
 
 };
