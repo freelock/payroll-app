@@ -220,7 +220,7 @@ export default {
       'payPeriods',
     ]),
     ...mapGetters([
-      'employeeCalc',
+      'employeeCalcYtd',
     ]),
     employeeData() {
       return this.employees.find(item => this.employee === item.id);
@@ -235,7 +235,10 @@ export default {
       return this.payStubData.deductions.health / 100;
     },
     payDataTotals() {
-      return this.employeeCalc[this.employee];
+      return this.employeeCalcYtd(this.pp.year, this.payperiod)[this.pp.year][this.employee];
+    },
+    pp() {
+      return this.payPeriods.find(item => this.payperiod === item.id);
     },
     payStubData() {
       const pp = this.payPeriods.find(item => this.payperiod === item.id);

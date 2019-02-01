@@ -178,14 +178,13 @@ export default {
       'payPeriods',
     ]),
     ...mapGetters([
-      'employeeCalc',
-      'employeeCalcPeriod',
+      'employeeCalcYtd',
     ]),
     employeeData() {
       return this.employees.find(item => this.employee === item.id);
     },
     payDataTotals() {
-      return this.employeeCalcPeriod(this.pp.year, this.payperiod)[this.employee];
+      return this.employeeCalcYtd(this.pp.year, this.payperiod)[this.pp.year][this.employee];
     },
     pp() {
       return this.payPeriods.find(item => this.payperiod === item.id);

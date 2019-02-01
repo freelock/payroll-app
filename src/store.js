@@ -407,16 +407,12 @@ export default new Vuex.Store({
       return result;
     },
 
-    employeeCalc: (state, getters) => getters.employeeCalcOld(config.CURRENT_YEAR),
-
-    employeeCalcTax: (state, getters) => getters.employeeCalcOld(config.LAST_YEAR),
-
     employeeMonth: (state, getters) => getters.employeeCalcPeriod('month'),
     employeeQuarter: (state, getters) => getters.employeeCalcPeriod('quarter'),
     employeeYear: (state, getters) => getters.employeeCalcPeriod('year'),
 
-    employeeCalcOld: (state, getters) => (year, id) => {
-      const payperiods = getters.yearToDate(year, id);
+    employeeCalcYtd: (state, getters) => (year, ppId) => {
+      const payperiods = getters.yearToDate(year, ppId);
       return getters.employeeCalcPeriods('year', payperiods);
     },
     employeeCalcPeriod: (state, getters) => period =>
