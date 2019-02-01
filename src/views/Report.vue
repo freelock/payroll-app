@@ -26,7 +26,6 @@
         <td>Total:</td>
         <td class="value">{{ ssTotal | currency }}</td>
       <tr>
-      </tr>
         <td class="item">Medicare - Employee</td>
         <td class="value">{{ amounts.medEe | currency }} </td>
         <td>Medicare income</td>
@@ -116,11 +115,18 @@
         <td class="value">{{ amounts.hourlyWorkedExempt }}</td>
       </tr>
     </table>
+    <w2table
+      class="fullwidth"
+      :period="period"
+      :periods="periods"
+      ></w2table>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import w2 from '../views/w2.vue';
+
 export default {
   props: [
     'period',
@@ -133,7 +139,7 @@ export default {
       'employerYear',
     ]),
     amounts() {
-      const func = 'employer' + this.$options.filters.capitalize(this.periods);
+      const func = `employer${this.$options.filters.capitalize(this.periods)}`;
       return this[func][this.period];
     },
     medTotal() {
@@ -143,9 +149,12 @@ export default {
       return this.amounts.ssEe + this.amounts.ssEr;
     },
     t941() {
-      const amounts = this.amounts;
+      const { amounts } = this;
       return amounts.FWH + amounts.ssEr + amounts.ssEe + amounts.medEe + amounts.medEr;
     },
+  },
+  components: {
+    w2table: w2,
   },
 };
 </script>
@@ -156,6 +165,9 @@ export default {
   grid-template-columns: 1fr 1fr;
 }
 .main h1 {
+  grid-column: 1 / -1;
+}
+.fullwidth {
   grid-column: 1 / -1;
 }
 .item {

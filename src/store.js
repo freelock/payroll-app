@@ -407,14 +407,30 @@ export default new Vuex.Store({
       return result;
     },
 
-    employeeCalc: (state, getters) => getters.employeeCalcPeriod(config.CURRENT_YEAR),
+    employeeCalc: (state, getters) => getters.employeeCalcOld(config.CURRENT_YEAR),
 
-    employeeCalcTax: (state, getters) => getters.employeeCalcPeriod(config.LAST_YEAR),
+    employeeCalcTax: (state, getters) => getters.employeeCalcOld(config.LAST_YEAR),
 
-    employeeCalcPeriod: (state, getters) => (year, id) => {
-      const result = getters.yearToDate(year, id).reduce((report, payperiod) => {
+    employeeMonth: (state, getters) => getters.employeeCalcPeriod('month'),
+    employeeQuarter: (state, getters) => getters.employeeCalcPeriod('quarter'),
+    employeeYear: (state, getters) => getters.employeeCalcPeriod('year'),
+
+    employeeCalcOld: (state, getters) => (year, id) => {
+      const payperiods = getters.yearToDate(year, id);
+      return getters.employeeCalcPeriods('year', payperiods);
+    },
+    employeeCalcPeriod: (state, getters) => period =>
+      getters.employeeCalcPeriods(period),
+
+    employeeCalcPeriods: state => (period, payperiods) => {
+      if (payperiods == null) {
         // eslint-disable-next-line
-        report = payperiod.employees.reduce((empreport, employee) => {
+        payperiods = state.payPeriods;
+      }
+      const result = payperiods.reduce((report, payperiod) => {
+        const timeframe = report[payperiod[period]] || {};
+        // eslint-disable-next-line
+        report[payperiod[period]] = payperiod.employees.reduce((empreport, employee) => {
           if (!empreport[employee.id]) {
             // eslint-disable-next-line
             empreport[employee.id] = {};
@@ -457,7 +473,7 @@ export default new Vuex.Store({
               current[item] = value + employee.totals[item];
               return current;
             }, values);
-            
+
           values = empreport[employee.id].accounts || {};
           const accts = employee.accounts || {};
           // eslint-disable-next-line
@@ -469,7 +485,7 @@ export default new Vuex.Store({
               return current;
             }, values);
           return empreport;
-        }, report);
+        }, timeframe);
         return report;
       }, {});
       return result;

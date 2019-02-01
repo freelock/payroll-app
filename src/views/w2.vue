@@ -1,10 +1,11 @@
 <template>
-  <div class="main">
+  <div class="fullwidth">
     <h1>{{ periods | capitalize }} W2/W3 Tax report for {{ period }}</h1>
     <v-data-table
       :headers="headers"
       :items="employees"
       :pagination="pagination"
+      class="w2table"
       @update:pagination="pagerUpdate"
       >
       <template slot="items" slot-scope="props">
@@ -17,6 +18,8 @@
           <td class="value">{{ props.item.taxes.medEe | currency }}</td>
           <td class="value">{{ props.item.deductions.health | currency }}</td>
           <td class="value">{{ props.item.deductions.health_value | currency }}</td>
+          <td class="value">{{ props.item.totals.hourlyTotal }}</td>
+          <td class="value">{{ props.item.totals.hourlyWorked }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -25,6 +28,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+
 export default {
   props: [
     'period',
@@ -40,6 +44,8 @@ export default {
       { text: 'Medicare Withheld', value: 'taxes.medEe' },
       { text: 'Health plan deduction', value: 'deductions.health' },
       { text: 'Health plan premiums - total', value: 'deductions.health' },
+      { text: 'Total hours', value: 'totals.hourlyTotal' },
+      { text: 'Worked hours', value: 'totals.hourlyWorked' },
     ],
     pagination: {
       descending: false,
@@ -52,11 +58,12 @@ export default {
   computed: {
     ...mapGetters([
       'employeeCalcTax',
+      'employeeYear',
       'employeeCalcPeriod',
     ]),
     employees() {
-      const data = this.employeeCalcTax;
-      return Object.keys(this.employeeCalcTax).map((item) => {
+      const data = this.employeeCalcPeriod(this.periods)[this.period];
+      return Object.keys(data).map((item) => {
         const employee = {
           id: item,
           ...data[item],
@@ -75,12 +82,15 @@ export default {
 </script>
 
 <style>
-.main {
+.fullwidth {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
-.main h1 {
+.fullwidth h1 {
   grid-column: 1 / -1;
+}
+.w2table {
+  overflow: auto;
 }
 .item {
   text-align: left;
