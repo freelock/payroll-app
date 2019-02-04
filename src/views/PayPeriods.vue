@@ -37,6 +37,11 @@
         @click.native="newPayPeriod">
         New pay period
       </v-btn>
+      <v-btn color="primary" dark class="mb-2"
+        v-show="payperiodsLoaded"
+        @click.native="newAccountBalance">
+        New starting balance
+      </v-btn>
       <v-btn @click.native="loadServer" color="primary">Load</v-btn>
       <v-btn @click.native="saveServer"
         v-show="payperiodsLoaded"
@@ -90,6 +95,10 @@ export default {
     async newPayPeriod() {
       await this.$store.dispatch('addNewPayPeriod', { id: this.createId });
       this.$router.push({ name: 'payperiod', params: { payperiod: this.createId } });
+    },
+    async newAccountBalance() {
+      await this.$store.dispatch('addNewPayPeriod', { id: this.createId });
+      this.$router.push({ name: 'accountbalance', params: { payperiod: this.createId } });
     },
     async saveServer() {
       try {

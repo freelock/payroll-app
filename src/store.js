@@ -201,6 +201,12 @@ export default new Vuex.Store({
             total: 0,
             tax_exempt: 0,
           },
+          accounts: {
+            ptoBalance: 0,
+            ptoNet: 0,
+            retirement: 0,
+            retirementBalance: 0,
+          },
           taxes: {
             employee: {
               total: 0,
@@ -351,7 +357,7 @@ export default new Vuex.Store({
      * Calculate account transactions:
      * + PTORate * hours worked
      * - PTOUsed
-     * + PTOStarting
+     * + PTOBalance
      * + Retirement deduction
      * + Retirement match
      * +- PTONet
@@ -380,8 +386,9 @@ export default new Vuex.Store({
         }
       } else {
         // balance transaction
-        ptoNet = payCheck.ptoBalance;
-        retirement = payCheck.retirementBalance;
+        console.log('balance trans:', payCheck);
+        ptoNet = payCheck.ptoBalance * 1;
+        retirement = payCheck.retirementBalance * 1;
       }
       accounts.ptoNet = ptoNet;
       accounts.retirement = retirement * 1;

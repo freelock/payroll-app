@@ -2,6 +2,7 @@
   <v-app>
     <v-toolbar
       app
+      class="noprint"
     >
       <v-btn to="/">
         <v-icon>home</v-icon>About
@@ -29,7 +30,7 @@
     <v-content>
       <router-view/>
     </v-content>
-    <v-footer :fixed="fixed" app>
+    <v-footer :fixed="fixed" app class="noprint">
       <span>&copy; 2018 Freelock</span>
     </v-footer>
   </v-app>
@@ -62,3 +63,20 @@ export default {
   },
 };
 </script>
+
+<style>
+@media print {
+  .noprint {
+    display: none;
+  }
+  @page {
+    margin: 0.5in;
+  }
+  th {
+    font-size: 12pt;
+  }
+  td {
+    font-size: 10pt;
+  }
+}
+</style>

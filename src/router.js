@@ -17,7 +17,7 @@ export default new Router({
     {
       path: '/employees',
       name: 'employees',
-      component: () => import(/* webpackChunkName: "about" */ './views/Employees.vue'),
+      component: () => import(/* webpackChunkName: "employee" */ './views/Employees.vue'),
     },
     {
       path: '/lineitems',
@@ -41,6 +41,12 @@ export default new Router({
       path: '/payperiods/:payperiod',
       name: 'payperiod',
       component: () => import(/* webpackChunkName: "payperiod" */ './views/PayPeriod.vue'),
+      props: true,
+    },
+    {
+      path: '/accounts/:payperiod',
+      name: 'accountbalance',
+      component: () => import(/* webpackChunkName: "employee" */ './views/Accounts.vue'),
       props: true,
     },
     {

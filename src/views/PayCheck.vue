@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click.native="navToPayperiod" color="primary">Go back to
+    <v-btn @click.native="navToPayperiod" class="noprint" color="primary">Go back to
       {{ payperiod }} pay period</v-btn>
     <h1>{{ payperiod }} Paystub for {{ employee | capitalize }}</h1>
     <div class="columns">
@@ -14,15 +14,14 @@
         <div>PTO accrual rate: {{ employeeData.rates.ptoRate }} per hour worked</div>
         <h2>Hours</h2>
         <div>{{ payStubData.hours }} Regular hours</div>
-        <div>{{ payStubData.ptoUsed }} PTO</div>
+        <div>{{ payStubData.ptoUsed }} PTO used</div>
         <div>{{ payStubData.holidayUsed }} Holiday</div>
         <div>{{ payDataTotals.income.hourlyWorked }} YTD hours worked</div>
         <div>{{ payDataTotals.income.hourlyTotal }} YTD Total hours</div>
         <h2>Balances</h2>
+        <div>PTO change: {{ payStubData.accounts.ptoNet }}</div>
         <div>PTO balance: {{ payDataTotals.accounts.ptoNet }} hours</div>
         <div>Total Retirement contribution: {{ payDataTotals.accounts.retirement | currency }}</div>
-      </div>
-      <div>
         <h2>Income</h2>
         <table class="paytable">
           <tr>
@@ -62,6 +61,8 @@
             <th class="value">{{ payDataTotals.income.total | currency }}</th>
           </tr>
         </table>
+      </div>
+      <div>
         <h2>Deductions</h2>
         <table class="paytable">
           <tr>
@@ -222,6 +223,7 @@ export default {
 .columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
 }
 
 .paytable {
