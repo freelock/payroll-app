@@ -386,7 +386,6 @@ export default new Vuex.Store({
         }
       } else {
         // balance transaction
-        console.log('balance trans:', payCheck);
         ptoNet = payCheck.ptoBalance * 1;
         retirement = payCheck.retirementBalance * 1;
       }
