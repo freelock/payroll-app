@@ -55,16 +55,16 @@ export default {
       const period = {
         ...this.selected,
         confirmed: true,
-      }
-      console.log(period);
+        type: 'payPeriod',
+      };
       this.$store.commit('updatePayPeriod', period);
     },
     unconfirmPayperiod() {
       const period = {
         ...this.selected,
         confirmed: false,
-      }
-      console.log(period);
+        type: 'payPeriod',
+      };
       this.$store.commit('updatePayPeriod', period);
     },
   },

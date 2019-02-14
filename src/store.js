@@ -242,7 +242,7 @@ export default new Vuex.Store({
     /**
      * Calculate taxes.
      */
-    calculateTaxes: (state, getters) => (paystub) => {
+    calculateTaxes: (state, getters) => (paystub, ppType) => {
       const taxes = {
         employee: {
           total: 0,
@@ -251,6 +251,9 @@ export default new Vuex.Store({
           due: 0,
         },
       };
+      if (ppType === 'accountBalance') {
+        return taxes;
+      }
       if (paystub.override) {
         // Recalculate totals only.
         Object.keys(paystub.taxes.employee).map((tax) => {
@@ -312,12 +315,15 @@ export default new Vuex.Store({
     /**
      * Look up a deduction amount on the employee.
      */
-    calculateDeductions: (state, getters) => (payCheck) => {
+    calculateDeductions: (state, getters) => (payCheck, ppType) => {
       const empRates = getters.getEmployeeById(payCheck.id).rates;
       const deductions = {
         total: 0,
         tax_exempt: 0,
       };
+      if (ppType === 'accountBalance') {
+        return deductions;
+      }
       state.lineItems.deductions.map((deduction) => {
         if (!empRates[deduction.id]) {
           return 0;
@@ -677,6 +683,7 @@ export default new Vuex.Store({
         quarter: `${year}-Q${quarter}`,
         month: `${year}-${month}`,
         confirmed: false,
+        type: 'payPeriod',
         ...payload,
       };
       commit('addPayPeriod', payPeriod);
@@ -703,29 +710,32 @@ export default new Vuex.Store({
       const ptoUsed = Dinero({ amount: Math.round(payCheck.ptoUsed * hourly * 100) });
       const holidayUsed = Dinero({ amount: Math.round(payCheck.holidayUsed * hourly * 100) });
       let total = ptoUsed.add(holidayUsed);
-      if (empRates.salary) {
-        let salary = Dinero({ amount: Math.round(empRates.salary / 0.24) });
-        salary = salary.subtract(total);
-        total = Dinero({ amount: Math.round(empRates.salary / 0.24) });
-        income.salary = salary.getAmount();
-        income.hourlyWorked = 83.33 - payCheck.ptoUsed - payCheck.holidayUsed;
-        income.hourlyTotal = 83.33;
+      if (payPeriod.type === 'accountBalance') {
+        // do nothing - set income to 0
       } else {
-        const hours = Dinero({ amount: Math.round(payCheck.hours * hourly * 100) });
-        const overtime = Dinero({ amount: Math.round(payCheck.overtime * hourly * 150) });
-        total = total.add(hours).add(overtime);
-        income.hours = hours.getAmount();
-        income.overtime = overtime.getAmount();
-        income.hourlyWorked = (1 * payCheck.hours) + (1 * payCheck.overtime);
-        income.hourlyTotal = income.hourlyWorked + (1 * payCheck.ptoUsed)
-          + (1 * payCheck.holidayUsed);
+        if (empRates.salary) {
+          let salary = Dinero({ amount: Math.round(empRates.salary / 0.24) });
+          salary = salary.subtract(total);
+          total = Dinero({ amount: Math.round(empRates.salary / 0.24) });
+          income.salary = salary.getAmount();
+          income.hourlyWorked = 83.33 - payCheck.ptoUsed - payCheck.holidayUsed;
+          income.hourlyTotal = 83.33;
+        } else {
+          const hours = Dinero({ amount: Math.round(payCheck.hours * hourly * 100) });
+          const overtime = Dinero({ amount: Math.round(payCheck.overtime * hourly * 150) });
+          total = total.add(hours).add(overtime);
+          income.hours = hours.getAmount();
+          income.overtime = overtime.getAmount();
+          income.hourlyWorked = (1 * payCheck.hours) + (1 * payCheck.overtime);
+          income.hourlyTotal = income.hourlyWorked + (1 * payCheck.ptoUsed)
+            + (1 * payCheck.holidayUsed);
+        }
+        income.ptoUsed = ptoUsed.getAmount();
+        income.holidayUsed = holidayUsed.getAmount();
+        income.bonus = payCheck.bonus * 100;
+        income.total = total.add(Dinero({ amount: payCheck.bonus * 100 })).getAmount();
+        income.taxable = income.total;
       }
-      income.ptoUsed = ptoUsed.getAmount();
-      income.holidayUsed = holidayUsed.getAmount();
-      income.bonus = payCheck.bonus * 100;
-      income.total = total.add(Dinero({ amount: payCheck.bonus * 100 })).getAmount();
-      income.taxable = income.total;
-
       const updateField = {
         ...payload,
         field: 'income',
@@ -737,19 +747,19 @@ export default new Vuex.Store({
         throw new Error('Hours changed but deductions/taxes have been modified.');
       }
       // Now calculate deductions.
-      const deductions = context.getters.calculateDeductions(payCheck);
+      const deductions = context.getters.calculateDeductions(payCheck, payPeriod.type);
       updateField.field = 'deductions';
       updateField.value = deductions;
       context.commit('updateHours', updateField);
 
       // On to taxes.
-      const taxes = context.getters.calculateTaxes(payCheck);
+      const taxes = context.getters.calculateTaxes(payCheck, payPeriod.type);
       updateField.field = 'taxes';
       updateField.value = taxes;
       context.commit('updateHours', updateField);
 
       // Finally, accounts.
-      const accounts = context.getters.calculateAccounts(payCheck);
+      const accounts = context.getters.calculateAccounts(payCheck, payPeriod.type);
       updateField.field = 'accounts';
       updateField.value = accounts;
       context.commit('updateHours', updateField);

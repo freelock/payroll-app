@@ -70,7 +70,11 @@ export default {
       return Dinero({ amount: myNum }).toFormat();
     },
     editItem(item) {
-      this.$router.push({ name: 'payperiod', params: { payperiod: item.id } });
+      if (item.employees[0].ptoBalance > 0) {
+        this.$router.push({ name: 'accountbalance', params: { payperiod: item.id } });
+      } else {
+        this.$router.push({ name: 'payperiod', params: { payperiod: item.id } });
+      }
     },
     deleteItem(item) {
       const index = this.payPeriods.indexOf(item);

@@ -55,6 +55,7 @@ export default {
       const period = {
         ...this.selected,
         confirmed: true,
+        type: 'accountBalance',
       };
       this.$store.commit('updatePayPeriod', period);
     },
@@ -62,6 +63,7 @@ export default {
       const period = {
         ...this.selected,
         confirmed: false,
+        type: 'accountBalance',
       };
       this.$store.commit('updatePayPeriod', period);
     },
