@@ -63,6 +63,10 @@
         <td class="item">WA Employment Administrative Fund</td>
         <td class="value">{{ amounts.eaf | currency }} </td>
       </tr>
+      <tr>
+        <td class="item">Family Leave Employee Withheld</td>
+        <td class="value">{{ amounts.waFmlEe | currency }} </td>
+      </tr>
       <tr class="spacer"><td>&nbsp;</td></tr>
       <tr>
         <th>Washington Workers Compensation</th>

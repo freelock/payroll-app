@@ -16,6 +16,7 @@
           <td class="value">{{ props.item.taxes.FWH | currency }}</td>
           <td class="value">{{ props.item.taxes.ssEe | currency }}</td>
           <td class="value">{{ props.item.taxes.medEe | currency }}</td>
+          <td class="value">{{ props.item.taxes.waFmlEe | currency }}</td>
           <td class="value">{{ props.item.deductions.health | currency }}</td>
           <td class="value">{{ props.item.deductions.health_value | currency }}</td>
           <td class="value">{{ props.item.totals.hourlyTotal }}</td>
@@ -42,6 +43,7 @@ export default {
       { text: 'Federal Witholding', value: 'taxes.FWH' },
       { text: 'Soc. Sec. Withheld', value: 'taxes.ssEe' },
       { text: 'Medicare Withheld', value: 'taxes.medEe' },
+      { text: 'WA Family Withheld', value: 'taxes.waFmlEe' },
       { text: 'Health plan deduction', value: 'deductions.health' },
       { text: 'Health plan premiums - total', value: 'deductions.health' },
       { text: 'Total hours', value: 'totals.hourlyTotal' },
