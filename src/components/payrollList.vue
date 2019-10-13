@@ -3,6 +3,8 @@
   <v-data-table
     :headers="headers"
     :items="employees"
+    :pagination="pagination"
+    @update:pagination="pagerUpdate"
     >
       <template slot="items" slot-scope="props">
         <tr>
@@ -116,6 +118,13 @@ export default {
 
       { text: 'Actions', value: 'name', sortable: false },
     ],
+    pagination: {
+      descending: false,
+      page: 1,
+      rowsPerPage: 25,
+      sortBy: 'id',
+      totalItems: 0,
+    },
     hours: {
       suffix: '',
       masked: false,
