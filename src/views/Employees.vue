@@ -35,9 +35,25 @@
                   prefix="$"
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm6 md4>
+                <v-flex xs12 sm12 md12>
+                  <fieldset><legend>W-2 info</legend>
                   <v-text-field v-model="editedItem.rates.FWH"
-                   label="FWH deductions"></v-text-field>
+                   label="1: FWH status - M, S, H"></v-text-field>
+                  <v-checkbox v-model="editedItem.rates.multipleJobs"
+                   label="2: Multiple Jobs"></v-checkbox>
+                  <v-text-field v-model="editedItem.rates.dependentDeductions"
+                  prefix="$" money="money"
+                   label="3: Dependent Deductions"></v-text-field>
+                  <v-text-field v-model="editedItem.rates.otherIncome"
+                  prefix="$" money="money"
+                   label="4a: Other income"></v-text-field>
+                  <v-text-field v-model="editedItem.rates.deductions"
+                  prefix="$" money="money"
+                   label="4b: Deductions"></v-text-field>
+                  <v-text-field v-model="editedItem.rates.extraWithholding"
+                  prefix="$" money="money"
+                   label="4c: Extra Withholding"></v-text-field>
+                  </fieldset>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-checkbox v-model="editedItem.rates.ssEe"
@@ -102,7 +118,12 @@ export default {
       class: 'temporary',
       rates: {
         hourlyRate: 15.00,
-        FWH: 'S1',
+        FWH: 'S',
+        dependentDeductions: 0,
+        otherIncome: 0,
+        deductions: 0,
+        extraWithholding: 0,
+        multipleJobs: 0,
         ssEe: 1,
         ssEr: 1,
         medEe: 1,
@@ -122,7 +143,12 @@ export default {
     },
     defaultRates: {
       hourlyRate: 15.00,
-      FWH: 'S1',
+      FWH: 'S',
+      dependentDeductions: 0,
+      otherIncome: 0,
+      deductions: 0,
+      extraWithholding: 0,
+      multipleJobs: 0,
       ssEe: 1,
       ssEr: 1,
       medEe: 1,

@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 // import { cloneDeep } from 'lodash.clonedeep';
+import fwh2020 from './utils/fwh2020';
 import fwh2019 from './utils/fwh2019';
 import fwh2018 from './utils/fwh2018';
 import fwh2017 from './utils/fwh2017';
@@ -101,7 +102,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 5.53,
+          rate: 6.44,
           applies: 'employee',
           group: 'LNI',
           chart_id: '2165',
@@ -111,7 +112,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 6.85,
+          rate: 7.52,
           applies: 'employer',
           group: 'LNI',
           chart_id: '6765',
@@ -151,7 +152,7 @@ export default new Vuex.Store({
           name: 'WA Unemployment Insurance',
           type: 'calculated',
           basis: 'hourlyTotal',
-          rate: 0.6,
+          rate: 1.8,
           applies: 'employer',
           group: 'esd',
           chart_id: '6767',
@@ -282,6 +283,9 @@ export default new Vuex.Store({
           if (paystub.payperiod > '2019-01') {
             fwh = fwh2019;
           }
+          if (paystub.payperiod > '2020-01') {
+            fwh = fwh2020;
+          }
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {
             case 'calculated':
@@ -289,7 +293,7 @@ export default new Vuex.Store({
               break;
             case 'fwh':
               taxes.employee[tax.id] = Dinero({
-                amount: Math.round(fwh(empRates[tax.id], (paystub.totals[tax.basis] / 100)) * 100),
+                amount: Math.round(fwh(empRates, (paystub.totals[tax.basis] / 100)) * 100),
               }).getAmount();
               break;
             case 'waFml':

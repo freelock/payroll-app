@@ -29,7 +29,8 @@ const semimonthly = {
   ],
 };
 const allowance = 175;
-const fwh = (allowances, taxableIncome) => {
+const fwh = (empRates, taxableIncome) => {
+  const allowances = empRates.FWH;
   const table = allowances.substring(0, 1).toLowerCase();
   const allow = allowances.substring(1);
   let taxable = taxableIncome - (allow * allowance);

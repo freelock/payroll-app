@@ -27,13 +27,16 @@ const semimonthly = {
   ],
 };
 const allowance = 168.8;
-const fwh = (allowances, taxableIncome) => {
+const fwh = (empRates, taxableIncome) => {
+  const allowances = empRates.FWH;
   const table = allowances.substring(0, 1).toLowerCase();
   const allow = allowances.substring(1);
   let taxable = taxableIncome - (allow * allowance);
   if (taxable < 0) {
     taxable = 0;
   }
+
+  // eslint-disable-next-line
   console.log('using 2017fwh tables;');
   const { bracket } = semimonthly[table].reduce((result, row) => {
     if (row.min <= taxable) {

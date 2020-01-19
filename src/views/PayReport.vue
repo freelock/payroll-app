@@ -10,7 +10,9 @@
         <th class="value">Total payroll</th>
       </tr>
       <tr v-for="(month, index) in months" :key="index">
-        <td class="item"><router-link :to="{ name: 'report', params: { periods: 'month', period: month } }">{{ month }}</router-link></td>
+        <td class="item"><router-link
+          :to="{ name: 'report', params: { periods: 'month', period: month } }"
+        >{{ month }}</router-link></td>
         <td class="value">{{ employerMonth[month].total_income | currency }}</td>
       </tr>
     </table>
@@ -22,7 +24,9 @@
         <th class="value">Total payroll</th>
       </tr>
       <tr v-for="(quarter, index) in quarters" :key="index">
-        <td class="item"><router-link :to="{ name: 'report', params: { periods: 'quarter', period: quarter } }">{{ quarter }}</router-link></td>
+        <td class="item"><router-link
+          :to="{ name: 'report', params: { periods: 'quarter', period: quarter } }"
+        >{{ quarter }}</router-link></td>
         <td class="value">{{ employerQuarter[quarter].total_income | currency }}</td>
       </tr>
     </table>
@@ -36,8 +40,12 @@
         <th class="value">Total payroll</th>
       </tr>
       <tr v-for="(year, index) in years" :key="index">
-        <td class="item"><router-link :to="{ name: 'report', params: { periods: 'year', period: year } }">{{ year }}</router-link></td>
-        <td class="item"><router-link :to="{ name: 'w2', params: { periods: 'year', period: year } }">{{ year }}</router-link></td>
+        <td class="item"><router-link
+          :to="{ name: 'report', params: { periods: 'year', period: year } }"
+        >{{ year }}</router-link></td>
+        <td class="item"><router-link
+          :to="{ name: 'w2', params: { periods: 'year', period: year } }"
+        >{{ year }}</router-link></td>
         <td class="value">{{ employerYear[year].total_income | currency }}</td>
       </tr>
     </table>
@@ -47,6 +55,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+
 export default {
 
   computed: {

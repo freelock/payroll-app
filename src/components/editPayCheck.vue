@@ -198,7 +198,6 @@
 <script>
 import { Money } from 'v-money';
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { setTimeout } from 'core-js';
 
 export default {
   props: [
