@@ -793,7 +793,7 @@ export default new Vuex.Store({
         context.commit('reloadEmployees', employees);
         return employees;
       } catch (error) {
-        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+        if (error.response.status === 401 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');
           await context.dispatch('refreshToken');
           context.commit('clearSemaphore');
@@ -808,7 +808,7 @@ export default new Vuex.Store({
       try {
         return await axios.post('/payroll/employees', employees);
       } catch (error) {
-        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+        if (error.response.status === 401 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');
           await context.dispatch('refreshToken');
           context.commit('clearSemaphore');
@@ -823,7 +823,7 @@ export default new Vuex.Store({
       try {
         return await axios.post('/payroll/lineitems', lineItems);
       } catch (error) {
-        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+        if (error.response.status === 401 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');
           await context.dispatch('refreshToken');
           context.commit('clearSemaphore');
@@ -840,7 +840,7 @@ export default new Vuex.Store({
         context.commit('reloadPayPeriods', payPeriods);
         return payPeriods;
       } catch (error) {
-        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+        if (error.response.status === 401 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');
           await context.dispatch('refreshToken');
           context.commit('clearSemaphore');
@@ -857,7 +857,7 @@ export default new Vuex.Store({
         context.commit('clearDirty');
         return savePromise;
       } catch (error) {
-        if (error.response.status === 403 && !context.state.refreshSemaphore) {
+        if (error.response.status === 401 && !context.state.refreshSemaphore) {
           context.commit('refreshSemaphore');
           await context.dispatch('refreshToken');
           context.commit('clearSemaphore');
