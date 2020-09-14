@@ -655,6 +655,7 @@ export default new Vuex.Store({
         data.append('client_id', config.uuid);
         data.append('client_secret', config.secret);
         data.append('refresh_token', localStorage.getItem('refresh_token'));
+        axios.defaults.headers.common.Authorization = '';
         axios.post('/oauth/token', data)
           .then((response) => {
             const token = response.data;
