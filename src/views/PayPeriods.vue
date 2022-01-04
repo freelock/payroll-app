@@ -97,7 +97,7 @@ export default {
       this.$router.push({ name: 'payperiod', params: { payperiod: this.createId } });
     },
     async newAccountBalance() {
-      await this.$store.dispatch('addNewPayPeriod', { id: this.createId });
+      await this.$store.dispatch('addNewPayPeriod', { id: this.createId, type: 'accountBalance' });
       this.$router.push({ name: 'accountbalance', params: { payperiod: this.createId } });
     },
     async saveServer() {

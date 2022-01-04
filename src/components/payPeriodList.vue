@@ -70,7 +70,7 @@ export default {
       return Dinero({ amount: myNum }).toFormat();
     },
     editItem(item) {
-      if (item.employees[0].ptoBalance > 0) {
+      if (item.type === 'accountBalance') {
         this.$router.push({ name: 'accountbalance', params: { payperiod: item.id } });
       } else {
         this.$router.push({ name: 'payperiod', params: { payperiod: item.id } });

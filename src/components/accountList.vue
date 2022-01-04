@@ -32,18 +32,6 @@
             ></v-text-field>
             {{ props.item.retirementBalance }}</td>
           <td class="justify-center layout px-0">
-          <v-icon
-            class="mr-2"
-            v-show="!confirmed"
-            @click="editPaystub(props.item)"
-          >
-            edit
-          </v-icon>
-          <v-icon
-            class="mr-2"
-            @click="showPaystub(props.item)">
-            attach_money
-          </v-icon>
         </td>
         </tr>
       </template>
@@ -86,18 +74,6 @@ export default {
         id: item.id,
       };
       this.$emit('itemSave', update);
-    },
-    editPaystub(employee) {
-      this.$router.push({
-        name: 'paystub-edit',
-        params: { payperiod: this.$route.params.payperiod, employee: employee.id },
-      });
-    },
-    showPaystub(employee) {
-      this.$router.push({
-        name: 'paystub',
-        params: { payperiod: this.$route.params.payperiod, employee: employee.id },
-      });
     },
     format(num) {
       const myNum = num || 0;
