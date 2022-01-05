@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 // import { cloneDeep } from 'lodash.clonedeep';
+import fwh2022 from './utils/fwh2022';
 import fwh2021 from './utils/fwh2021';
 import fwh2020 from './utils/fwh2020';
 import fwh2019 from './utils/fwh2019';
@@ -69,6 +70,10 @@ export default new Vuex.Store({
         },
       ],
       taxes: [
+        // Note on calculated taxes:
+        // rate is a percentage.
+        // However, when multiplied, currency values are x100 (to round to cents).
+        // Therefore rates on hours are based on 100, whereas rates on dollars are based on 1.
         {
           id: 'FWH',
           name: 'Federal Witholding',
@@ -103,7 +108,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 7.14,
+          rate: 8.09,
           applies: 'employee',
           group: 'LNI',
           chart_id: '2165',
@@ -113,7 +118,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 8.16,
+          rate: 9.06,
           applies: 'employer',
           group: 'LNI',
           chart_id: '6765',
@@ -163,10 +168,20 @@ export default new Vuex.Store({
           name: 'Washington Family/Medical Leave deduction',
           type: 'waFml',
           basis: 'medicare_income',
-          rate: 0.004,
+          rate: 0.006,
           applies: 'employee',
           group: 'esd',
           chart_id: '2167',
+        },
+        {
+          id: 'waCaresEe',
+          name: 'Washington Cares Long Term Care Fund',
+          type: 'calculated',
+          basis: 'medicare_income',
+          rate: 0.0058,
+          applies: 'employee',
+          group: 'esd',
+          chart_id: '2168',
         },
       ],
       accounts: [
@@ -290,6 +305,9 @@ export default new Vuex.Store({
           if (paystub.payperiod > '2021-01') {
             fwh = fwh2021;
           }
+          if (paystub.payperiod >= '2022-01') {
+            fwh = fwh2022;
+          }
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {
             case 'calculated':
@@ -303,8 +321,8 @@ export default new Vuex.Store({
             case 'waFml':
               // formula is 0.04% of basis, up to cap for total --
               // then employee pays 63.33% of that.
-              fmlTotal = basis.multiply(0.004);
-              taxes.employee[tax.id] = fmlTotal.multiply('0.6333').getAmount();
+              fmlTotal = basis.multiply(0.006);
+              taxes.employee[tax.id] = fmlTotal.multiply('0.7322').getAmount();
               break;
             default:
           }

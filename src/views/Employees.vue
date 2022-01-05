@@ -72,6 +72,8 @@
                    label="WA Employement Security"></v-checkbox>
                   <v-checkbox v-model="editedItem.rates.waFmlEe"
                    label="WA Family Medical Leave deduction"></v-checkbox>
+                  <v-checkbox v-model="editedItem.rates.waCaresEe"
+                   label="WA Cares LTC Fund"></v-checkbox>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.rates.ptoRate"
@@ -131,6 +133,7 @@ export default {
         lni: 1,
         esd: 1,
         waFmlEe: 1,
+        waCaresEe: 1,
         ptoRate: 0.04,
       },
       status: 1,
@@ -156,6 +159,7 @@ export default {
       lni: 1,
       esd: 1,
       waFmlEe: 1,
+      waCaresEe: 1,
       ptoRate: 0.04,
     },
     classes: [
