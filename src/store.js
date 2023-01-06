@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 // import { cloneDeep } from 'lodash.clonedeep';
+import fwh2023 from './utils/fwh2023';
 import fwh2022 from './utils/fwh2022';
 import fwh2021 from './utils/fwh2021';
 import fwh2020 from './utils/fwh2020';
@@ -108,7 +109,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 8.09,
+          rate: 8.6,
           applies: 'employee',
           group: 'LNI',
           chart_id: '2165',
@@ -118,7 +119,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 9.06,
+          rate: 9.53,
           applies: 'employer',
           group: 'LNI',
           chart_id: '6765',
@@ -158,7 +159,7 @@ export default new Vuex.Store({
           name: 'WA Unemployment Insurance',
           type: 'calculated',
           basis: 'hourlyTotal',
-          rate: 2.51,
+          rate: 0.54,
           applies: 'employer',
           group: 'esd',
           chart_id: '6767',
@@ -307,6 +308,9 @@ export default new Vuex.Store({
           }
           if (paystub.payperiod >= '2022-01') {
             fwh = fwh2022;
+          }
+          if (paystub.payperiod >= '2022-02') {
+            fwh = fwh2023;
           }
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {

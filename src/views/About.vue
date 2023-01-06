@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Payroll Proof-of-concept App</h1>
+    <h1>Payroll App 2023</h1>
     <p>This is a proof-of-concept UI for generating payroll, calculating deductions,
       managing PTO, and more. The goal is to build something fast and easy to use,
       and eventually post the resulting transactions into
@@ -15,7 +15,7 @@
       deductions.
     </p>
     <p>At the moment, the app does not save data (anywhere other than Vuex, that is)
-      -- if you refresh your browser, you will lose all of your data.
+      -- if you refresh your browser, you will lose all of your data. Updates for 2023-S and M employee tax rates.
     </p>
     <p>
       Tax calculations should be correct for Washington State, using 2018 IRS tax tables.
