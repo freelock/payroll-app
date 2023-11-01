@@ -67,6 +67,10 @@
         <td class="item">Family Leave Employee Withheld</td>
         <td class="value">{{ amounts.waFmlEe | currency }} </td>
       </tr>
+      <tr>
+        <td class="item">Wa Cares Employee Withheld</td>
+        <td class="value">{{ amounts.waCaresEe | currency }} </td>
+      </tr>
       <tr class="spacer"><td>&nbsp;</td></tr>
       <tr>
         <th>Washington Workers Compensation</th>
