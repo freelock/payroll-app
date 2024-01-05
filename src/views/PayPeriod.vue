@@ -16,12 +16,14 @@
       :confirmed="selected.confirmed"
       >
     </payroll-list>
+    <FwhReport :amounts="selected.employer"></FwhReport>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import payrollList from '../components/payrollList.vue';
+import FwhReport from '@/components/FwhReport.vue';
 
 export default {
   props: [
@@ -41,6 +43,7 @@ export default {
     },
   },
   components: {
+    FwhReport,
     'payroll-list': payrollList,
   },
   methods: {

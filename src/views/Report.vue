@@ -1,46 +1,9 @@
 <template>
   <div class="main">
     <h1>{{ periods | capitalize }} Tax report for {{ period }}</h1>
+    <FwhReport :amounts="amounts"></FwhReport>
+
     <table>
-      <tr>
-        <th class="item">Federal Taxes (941/944)</th>
-        <th class="value">Tax Amount</th>
-        <th>Basis</th>
-        <th class="value">Amount</th>
-      </tr>
-      <tr>
-        <td class="item">Federal Income Tax</td>
-        <td class="value">{{ amounts.FWH | currency }} </td>
-        <td>Taxable income</td>
-        <td class="value">{{ amounts.taxable_income | currency }} </td>
-      </tr>
-      <tr>
-        <td class="item">Social Security - Employee</td>
-        <td class="value">{{ amounts.ssEe | currency}} </td>
-        <td>Medicare income</td>
-        <td class="value">{{ amounts.medicare_income | currency }} </td>
-      </tr>
-      <tr>
-        <td class="item">Social Security - Employer</td>
-        <td class="value">{{ amounts.ssEr | currency }} </td>
-        <td>Total:</td>
-        <td class="value">{{ ssTotal | currency }}</td>
-      <tr>
-        <td class="item">Medicare - Employee</td>
-        <td class="value">{{ amounts.medEe | currency }} </td>
-        <td>Medicare income</td>
-        <td class="value">{{ amounts.medicare_income | currency }} </td>
-      </tr>
-      <tr>
-        <td class="item">Medicare - Employer</td>
-        <td class="value">{{ amounts.medEr | currency }} </td>
-        <td>Total:</td>
-        <td class="value">{{ medTotal |currency }}</td>
-      </tr>
-      <tr>
-        <th class="item">Totals</th>
-        <th class="value">{{ t941 | currency}}</th>
-      </tr>
       <tr class="spacer"><td>&nbsp;</td></tr>
       <tr>
         <th>Federal Unemployment (940)</th>
@@ -85,6 +48,7 @@
         <td class="value">{{ amounts.lniEr | currency }} </td>
       </tr>
     </table>
+
     <table>
       <tr>
         <th class="item">Item</th>
@@ -133,6 +97,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import FwhReport from '@/components/FwhReport.vue';
 import w2 from '../views/w2.vue';
 
 export default {
@@ -150,18 +115,9 @@ export default {
       const func = `employer${this.$options.filters.capitalize(this.periods)}`;
       return this[func][this.period];
     },
-    medTotal() {
-      return this.amounts.medEe + this.amounts.medEr;
-    },
-    ssTotal() {
-      return this.amounts.ssEe + this.amounts.ssEr;
-    },
-    t941() {
-      const { amounts } = this;
-      return amounts.FWH + amounts.ssEr + amounts.ssEe + amounts.medEe + amounts.medEr;
-    },
   },
   components: {
+    FwhReport,
     w2table: w2,
   },
 };
@@ -171,6 +127,7 @@ export default {
 .main {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 .main h1 {
   grid-column: 1 / -1;

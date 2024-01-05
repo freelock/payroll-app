@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Dinero from 'dinero.js';
 // import { cloneDeep } from 'lodash.clonedeep';
+import fwh2024 from './utils/fwh2024';
 import fwh2023 from './utils/fwh2023';
 import fwh2022 from './utils/fwh2022';
 import fwh2021 from './utils/fwh2021';
@@ -109,7 +110,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 8.6,
+          rate: 8.75,
           applies: 'employee',
           group: 'LNI',
           chart_id: '2165',
@@ -119,7 +120,7 @@ export default new Vuex.Store({
           name: 'Labor and Industries',
           type: 'calculated',
           basis: 'hourlyWorked',
-          rate: 9.53,
+          rate: 18.39,
           applies: 'employer',
           group: 'LNI',
           chart_id: '6765',
@@ -167,7 +168,7 @@ export default new Vuex.Store({
         {
           id: 'waFmlEe',
           name: 'Washington Family/Medical Leave deduction',
-          type: 'waFml',
+          type: 'calculated', // was waFml
           basis: 'medicare_income',
           rate: 0.0058208, // 72.76% of 0.8%, 2023 rate
           applies: 'employee',
@@ -311,6 +312,9 @@ export default new Vuex.Store({
           }
           if (paystub.payperiod >= '2022-02') {
             fwh = fwh2023;
+          }
+          if (paystub.payperiod >= '2024-01') {
+            fwh = fwh2024;
           }
           const total = Dinero({ amount: taxes.employee.total });
           switch (tax.type) {

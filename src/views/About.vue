@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Payroll App 2023</h1>
+    <h1>Payroll App 2024</h1>
     <p>This is a proof-of-concept UI for generating payroll, calculating deductions,
       managing PTO, and more. The goal is to build something fast and easy to use,
       and eventually post the resulting transactions into
@@ -45,6 +45,7 @@ export default {
 .v-content__wrap {
   margin: 20px 50px;
   font-size: 18px;
+  grid-template-columns: repeat(auto-fill, minmax());
 }
 
 </style>
